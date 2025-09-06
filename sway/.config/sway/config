@@ -1,0 +1,198 @@
+# ======================
+# Custom Sway configuration (Laptop)
+# Updated from dual-monitor to single-display; keybinds use $mod
+# Reference: man 5 sway
+# ======================
+
+### Variables
+set $mod Mod4
+set $left h
+set $down j
+set $up   k
+set $right l
+set $term kitty
+set $filebrowser nemo
+set $menu wofi --show drun
+set $browser firefox
+set $chat vesktop
+
+# Outputs + wallpaper
+set $wall      ~/wallpapers/wallhaven-1pdk1v_3440x1440.png
+
+# ======================
+# Workspace Configuration (optional, kept for reference)
+# ======================
+# set $ws1  "1:dev"
+# set $ws2  "2:web"
+# set $ws3  "3:comm"
+# set $ws4  "4:files"
+# set $ws5  "5:monitor"
+# set $ws6  "6:term"
+# set $ws7  "7:notes"
+# set $ws8  "8:chat"
+# set $ws9  "9:media"
+# set $ws10 "10:temp"
+
+include /etc/sway/config-vars.d/*
+
+### Output Configuration
+    # Wallpaper
+    output * bg $wall fill
+
+    # Laptop display only (adjust scale if text is too small/large)
+    # output eDP-1 scale 1.25
+
+    # Dual-monitor layout (commented out; re-enable if you dock)
+    # output DP-1 resolution 3840x2160 position 0,0    scale 1
+    # output DP-2 resolution 3840x2160 position 3840,0 scale 1
+
+### Input Configuration
+    input type:keyboard {
+        xkb_layout us
+        # xkb_options "caps:hyper,hyper:mod3,lv3:rctrl_switch"  # optional
+    }
+
+### Application Bindings
+    # Core
+    bindsym $mod+Return exec $term
+    bindsym $mod+q kill
+
+    # Launcher
+    bindsym $mod+d exec $menu
+
+    # File managers
+    bindsym $mod+n exec $filebrowser
+    bindsym $mod+t exec thunar 
+
+    # Applications
+    bindsym $mod+Shift+b exec $browser
+    bindsym $mod+Shift+d [app_id="vesktop"] focus; exec vesktop
+    bindsym $mod+o exec flatpak run md.obsidian.Obsidian
+    bindsym $mod+Shift+t exec flatpak run org.gnome.TextEditor
+    bindsym $mod+x exec subl
+    bindsym $mod+c exec codium
+    bindsym $mod+g exec google-chrome-stable
+
+    # System controls
+    bindsym $mod+Shift+c reload
+    bindsym $mod+Shift+e exec swaynag -t warning -m 'Do you really want to exit sway?' -B 'Yes' 'swaymsg exit'
+
+### Tools & Utilities
+    bindsym $mod+Shift+s exec grim -g "$(slurp)" - | swappy -f -
+    bindsym Print exec grim
+    bindsym $mod+p exec hyprpicker -a && notify-send "Color picked" "$(wl-paste)"
+    bindsym $mod+Shift+v exec bash -lc 'cliphist list | wofi --show dmenu | cliphist decode | wl-copy'
+
+### Window Management
+    bindsym $mod+$left  focus left
+    bindsym $mod+$down  focus down
+    bindsym $mod+$up    focus up
+    bindsym $mod+$right focus right
+    bindsym $mod+Left   focus left
+    bindsym $mod+Down   focus down
+    bindsym $mod+Up     focus up
+    bindsym $mod+Right  focus right
+
+    bindsym $mod+Shift+$left  move left
+    bindsym $mod+Shift+$down  move down
+    bindsym $mod+Shift+$up    move up
+    bindsym $mod+Shift+$right move right
+    bindsym $mod+Shift+Left   move left
+    bindsym $mod+Shift+Down   move down
+    bindsym $mod+Shift+Up     move up
+    bindsym $mod+Shift+Right  move right
+
+### Workspace Management
+    bindsym $mod+1 workspace number 1
+    bindsym $mod+2 workspace number 2
+    bindsym $mod+3 workspace number 3
+    bindsym $mod+4 workspace number 4
+    bindsym $mod+5 workspace number 5
+    bindsym $mod+6 workspace number 6
+    bindsym $mod+7 workspace number 7
+    bindsym $mod+8 workspace number 8
+    bindsym $mod+9 workspace number 9
+    bindsym $mod+0 workspace number 10
+
+    bindsym $mod+Shift+1 move container to workspace number 1
+    bindsym $mod+Shift+2 move container to workspace number 2
+    bindsym $mod+Shift+3 move container to workspace number 3
+    bindsym $mod+Shift+4 move container to workspace number 4
+    bindsym $mod+Shift+5 move container to workspace number 5
+    bindsym $mod+Shift+6 move container to workspace number 6
+    bindsym $mod+Shift+7 move container to workspace number 7
+    bindsym $mod+Shift+8 move container to workspace number 8
+    bindsym $mod+Shift+9 move container to workspace number 9
+    bindsym $mod+Shift+0 move container to workspace number 10
+
+    bindsym $mod+Ctrl+Left  exec swaymsg workspace prev
+    bindsym $mod+Ctrl+Right exec swaymsg workspace next
+    bindsym $mod+Ctrl+$left  exec swaymsg workspace prev
+    bindsym $mod+Ctrl+$right exec swaymsg workspace next
+
+### Layout Controls
+    bindsym $mod+b splith
+    bindsym $mod+v splitv
+    bindsym $mod+s layout stacking
+    bindsym $mod+w layout tabbed
+    bindsym $mod+e layout toggle split
+    bindsym $mod+f fullscreen
+    bindsym $mod+Shift+space floating toggle
+    bindsym $mod+space focus mode_toggle
+
+    bindsym $mod+Shift+minus move scratchpad
+    bindsym $mod+minus scratchpad show
+
+### Focus Behavior
+    focus_follows_mouse no
+
+
+### Gaps
+    gaps inner 10
+    gaps outer 5
+    smart_gaps on
+    smart_borders on
+
+    bindsym $mod+comma  gaps inner all minus 5
+    bindsym $mod+period gaps inner all plus 5
+    bindsym $mod+Shift+comma  gaps outer all minus 5
+    bindsym $mod+Shift+period gaps outer all plus 5
+
+### Media & Hardware Controls
+    bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+    bindsym --locked XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
+    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+
+### Resize Mode
+mode "resize" {
+    bindsym $left  resize shrink width 10px
+    bindsym $right resize grow   width 10px
+    bindsym $up    resize shrink height 10px
+    bindsym $down  resize grow   height 10px
+    bindsym Left   resize shrink width 10px
+    bindsym Right  resize grow   width 10px
+    bindsym Up     resize shrink height 10px
+    bindsym Down   resize grow   height 10px
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+### Bar Configuration
+bar {
+    swaybar_command waybar
+}
+
+### Autostart Applications
+    exec wl-paste --watch cliphist store
+    exec_always swaync
+    exec blueman-applet
+    exec_always --no-startup-id /usr/lib/xdg-desktop-portal -r
+    exec_always --no-startup-id /usr/lib/xdg-desktop-portal-wlr
+
+### Include System Defaults
+include /etc/sway/config.d/*
+

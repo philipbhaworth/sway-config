@@ -16,6 +16,7 @@ set $filebrowser nemo
 set $menu wofi --show drun
 set $browser firefox
 set $chat vesktop
+set $power-menu ~/sway-config/sway-scripts/wofi-power.sh
 
 # Outputs + wallpaper
 set $wall      ~/wallpapers/wallhaven-1pdk1v_3440x1440.png
@@ -138,14 +139,15 @@ include /etc/sway/config-vars.d/*
     bindsym $mod+o exec flatpak run md.obsidian.Obsidian
 
     # System controls
-    bindsym $mod+Shift+c reload
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'Do you really want to exit sway?' -B 'Yes' 'swaymsg exit'
+    bindsym $mod+Shift+r reload
+    bindsym $mod+Shift+q exec swaynag -t warning -m 'Do you really want to exit sway?' -B 'Yes' 'swaymsg exit'
 
 ### Tools & Utilities
     bindsym $mod+Shift+s exec grim -g "$(slurp)" - | swappy -f -
     bindsym Print exec grim
     bindsym $mod+p exec hyprpicker -a && notify-send "Color picked" "$(wl-paste)"
     bindsym $mod+Shift+v exec bash -lc 'cliphist list | wofi --show dmenu | cliphist decode | wl-copy'
+    bindsym $mod+Shift+x exec $power-menu
 
 ### Focus Behavior
     focus_follows_mouse no

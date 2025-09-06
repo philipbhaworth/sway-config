@@ -1,0 +1,85 @@
+/* Wofi Everforest: high-contrast panel that won't blend into dark apps */
+
+/* Outer window panel */
+window {
+    margin: 0;
+    background-color: #38423d;      /* noticeably different from app bg */
+    border-radius: 14px;
+    border: 3px solid #d3c6aa;      /* light ring for separation */
+}
+
+/* Secondary ring to create a double-edge effect */
+#outer-box {
+    margin: 0;
+    border-radius: 12px;
+    background-color: #2b3339;      /* darker than window to create depth */
+    border: 2px solid #7a8478;      /* neutral inner ring */
+}
+
+/* List container */
+#inner-box {
+    margin: 6px;
+    border-radius: 10px;
+    background-color: #323c41;      /* list body */
+    border: 1px solid #7a8478;
+    color: #d3c6aa;
+    font-weight: 600;
+}
+
+#scroll {
+    margin: 6px 0;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+}
+
+/* Input */
+#input {
+    margin: 10px 12px 8px 12px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background-color: #3a454a;
+    border: 2px solid #7a8478;
+    color: #d3c6aa;
+    font-weight: 700;
+    outline: none;
+}
+
+#input:focus {
+    background-color: #414d52;
+    border: 2px solid #a7c080;      /* accent on focus */
+}
+
+/* Entries */
+#entry {
+    margin: 3px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+#entry:hover {
+    background-color: #3a454a;
+    border: 1px solid #7a8478;
+}
+
+#entry:selected {
+    background-color: #a7c080;      /* accent selection */
+    color: #2b3339;
+    border: 1px solid #d3c6aa;      /* light edge to “lift” */
+    font-weight: 700;
+}
+
+#text:selected {
+    background-color: #a7c080;
+    color: #2b3339;
+    font-weight: 700;
+    border-radius: 6px;
+}
+
+#img { margin-right: 10px; }
+#img:selected {
+    background-color: #a7c080;
+    border-radius: 6px;
+}

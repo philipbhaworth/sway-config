@@ -28,19 +28,6 @@
 @define-color white #ebdbb2;
 @define-color orange #d65d0e;
 
-/* Tokyo Night */
-@define-color background #1a1b26;
-@define-color background-light #24283b;
-@define-color foreground #c0caf5;
-@define-color black #15161e;
-@define-color red #f7768e;
-@define-color green #9ece6a;
-@define-color yellow #e0af68;
-@define-color blue #7aa2f7;
-@define-color magenta #bb9af7;
-@define-color cyan #7dcfff;
-@define-color white #a9b1d6;
-@define-color orange #ff9e64;
 
 /* Everforest Dark Colors */
 @define-color background #2b3339;
@@ -56,6 +43,38 @@
 @define-color white #d3c6aa;
 @define-color orange #e69875;
 
+
+/* Dracula-style Colors */
+@define-color background         #282a36;
+@define-color selection           #44475a;
+@define-color foreground         #f8f8f2;
+@define-color black              #21222c; /* ANSI Black */
+@define-color red                #ff5555;
+@define-color green              #50fa7b;
+@define-color yellow             #f1fa8c;
+@define-color blue               #bd93f9; /* ANSI Blue */
+@define-color magenta            #ff79c6;
+@define-color cyan               #8be9fd;
+@define-color white              #f8f8f2; /* Bright White / Foreground */
+@define-color orange             #ffb86c;
+
+
+/* Tokyo Night */
+@define-color background #1a1b26;
+@define-color background-light #24283b;
+@define-color foreground #c0caf5;
+@define-color black #15161e;
+@define-color red #f7768e;
+@define-color green #9ece6a;
+@define-color yellow #e0af68;
+@define-color blue #7aa2f7;
+@define-color magenta #bb9af7;
+@define-color cyan #7dcfff;
+@define-color white #a9b1d6;
+@define-color orange #ff9e64;
+
+
+
 /* Module-specific colors */
 @define-color workspaces-color @foreground;
 @define-color workspaces-focused-bg @green;
@@ -64,30 +83,57 @@
 @define-color workspaces-urgent-fg @black;
 
 /* Text and border colors for modules */
-@define-color mode-color @orange;
-@define-color mpd-color @magenta;
-@define-color weather-color @magenta;
-@define-color playerctl-color @magenta;
-@define-color clock-color @blue;
-@define-color cpu-color @green;
-@define-color memory-color @magenta;
-@define-color temperature-color @yellow;
+/*@define-color mode-color @orange; */
+/*@define-color mpd-color @magenta; */
+/*@define-color weather-color @magenta; */
+/*@define-color playerctl-color @magenta; */
+/*@define-color clock-color @blue; */
+/*@define-color cpu-color @green; */
+/*@define-color memory-color @magenta; */
+/*@define-color temperature-color @yellow; */
+/*@define-color temperature-critical-color @red; */
+/*@define-color battery-color @cyan; */
+/*@define-color battery-charging-color @green; */
+/*@define-color battery-warning-color @yellow; */
+/*@define-color battery-critical-color @red; */
+/*@define-color network-color @blue; */
+/*@define-color network-disconnected-color @red; */
+/*@define-color pulseaudio-color @orange; */
+/*@define-color pulseaudio-muted-color @red; */
+/*@define-color backlight-color @yellow; */
+/*@define-color disk-color @cyan; */
+/*@define-color uptime-color @green; */
+/*@define-color updates-color @orange; */
+/*@define-color quote-color @green; */
+/*@define-color idle-inhibitor-color @foreground; */
+/*@define-color idle-inhibitor-active-color @red; */
+
+/* Text and border colors for modules */
+@define-color mode-color @foreground;
+@define-color mpd-color @foreground;
+@define-color weather-color @foreground;
+@define-color playerctl-color @foreground;
+@define-color clock-color @foreground;
+@define-color cpu-color @foreground;
+@define-color memory-color @foreground;
+@define-color temperature-color @foreground;
 @define-color temperature-critical-color @red;
-@define-color battery-color @cyan;
+@define-color battery-color @foreground;
 @define-color battery-charging-color @green;
 @define-color battery-warning-color @yellow;
 @define-color battery-critical-color @red;
-@define-color network-color @blue;
+@define-color network-color @foreground;
 @define-color network-disconnected-color @red;
-@define-color pulseaudio-color @orange;
+@define-color pulseaudio-color @foreground;
 @define-color pulseaudio-muted-color @red;
-@define-color backlight-color @yellow;
-@define-color disk-color @cyan;
-@define-color uptime-color @green;
+@define-color backlight-color @foreground;
+@define-color disk-color @foreground;
+@define-color uptime-color @foreground;
 @define-color updates-color @orange;
-@define-color quote-color @green;
+@define-color quote-color @foreground;
 @define-color idle-inhibitor-color @foreground;
 @define-color idle-inhibitor-active-color @red;
+
 
 * {
     /* Base styling for all modules */
@@ -120,10 +166,10 @@ window#waybar {
 }
 
 #workspaces button {
-    padding: 0 10px;
+    padding: 0 6px;
     background-color: transparent;
     color: @workspaces-color;
-    margin: 0;
+    margin: 0 1px;
 }
 
 #workspaces button:hover {

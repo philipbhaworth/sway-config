@@ -24,7 +24,7 @@ sudo apt install -y pavucontrol pulseaudio
 sudo apt install -y nemo ranger tree htop btop
 
 # Development tools
-sudo apt install -y git vim geany geany-plugins codium
+sudo apt install -y git vim geany geany-plugins 
 
 # Launchers and menus
 sudo apt install -y wofi
@@ -57,6 +57,10 @@ sudo apt install -y gtk2-engines-murrine nwg-look
 # Fonts
 sudo apt install -y fonts-inter fonts-noto-mono
 ```
+
+**Go to apps website for install instructions**
+- Codium
+- Sublime-text4
 
 ## Flatpak Applications
 

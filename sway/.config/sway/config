@@ -134,6 +134,7 @@ include /etc/sway/config-vars.d/*
     bindsym $mod+c exec codium
     bindsym $mod+x exec subl
     bindsym $mod+Shift+t exec flatpak run org.gnome.TextEditor
+    bindsym $mod+p exec pluma 
 
     # Other applications
     bindsym $mod+o exec flatpak run md.obsidian.Obsidian
@@ -145,8 +146,8 @@ include /etc/sway/config-vars.d/*
 ### Tools & Utilities
     bindsym $mod+Shift+s exec grim -g "$(slurp)" - | swappy -f -
     bindsym Print exec grim
-    bindsym $mod+p exec hyprpicker -a && notify-send "Color picked" "$(wl-paste)"
-    bindsym $mod+Shift+v exec bash -lc 'cliphist list | wofi --show dmenu | cliphist decode | wl-copy'
+    bindsym $mod+Shift+p exec hyprpicker -a && notify-send "Color picked" "$(wl-paste)"
+    bindsym $mod+Shift+v exec bash -lc "cliphist list | wofi --dmenu | cliphist decode | wl-copy"
     bindsym $mod+Shift+x exec $power-menu
 
 ### Focus Behavior
@@ -203,7 +204,8 @@ bar {
 }
 
 ### Autostart Applications
-    exec wl-paste --watch cliphist store
+    exec_always wl-paste -t text  --watch cliphist store
+    exec_always wl-paste -t image --watch cliphist store
     exec_always swaync
     exec blueman-applet
     exec_always --no-startup-id /usr/lib/xdg-desktop-portal -r

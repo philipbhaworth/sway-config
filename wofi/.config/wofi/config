@@ -1,7 +1,7 @@
 # ~/.config/wofi/config
 show=drun
 width=750
-height=500
+height=600
 style=~/.config/wofi/style.css
 location=center
 prompt=Apps
@@ -21,3 +21,4 @@ term=kitty
 hide_scroll=true
 print_command=true
 columns=2
+sort_order=alphabetical

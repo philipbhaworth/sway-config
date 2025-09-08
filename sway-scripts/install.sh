@@ -31,12 +31,6 @@ apt_install() {
   apt-get install -y --no-install-recommends "$@"
 }
 
-try_install() {
-  if ! apt-get install -y --no-install-recommends "$@"; then
-    echo "Note: one or more optional packages failed to install: $*"
-  fi
-}
-
 # --- Package sets ------------------------------------------------------------
 BASE_PKGS=(
   build-essential git curl wget unzip p7zip-full
@@ -49,7 +43,9 @@ SWAY_WAYLAND_PKGS=(
 )
 
 PORTAL_PKGS=( xdg-desktop-portal xdg-desktop-portal-wlr )
+
 TERM_EDITOR_PKGS=( foot kitty pluma )
+
 FILES_STORAGE_PKGS=(
   thunar thunar-volman thunar-archive-plugin
   tumbler ffmpegthumbnailer
@@ -57,13 +53,34 @@ FILES_STORAGE_PKGS=(
   udisks2 file-roller udiskie
   gnome-disk-utility
 )
-FONTS_THEME_PKGS=( fonts-dejavu fonts-noto fonts-noto-color-emoji fonts-font-awesome nwg-look )
-AUDIO_NOTIFY_PKGS=( pipewire pipewire-audio wireplumber libspa-0.2-bluetooth alsa-utils sway-notification-center )
+
+FONTS_THEME_PKGS=(
+  fonts-dejavu fonts-noto fonts-noto-color-emoji
+  fonts-font-awesome nwg-look
+)
+
+AUDIO_NOTIFY_PKGS=(
+  pipewire pipewire-audio wireplumber libspa-0.2-bluetooth
+  alsa-utils sway-notification-center
+  pavucontrol
+  libnotify-bin
+)
+
 BLUETOOTH_PKGS=( bluez blueman )
 NETWORK_PKGS=( network-manager )
 POLKIT_PKGS=( lxqt-policykit )
 MEDIA_PKGS=( qimgv mpv )
 POWER_QOL_PKGS=( brightnessctl gammastep )
+
+# Launchers / desktop utilities
+LAUNCHER_UTIL_PKGS=(
+  wofi
+  wlogout
+  swappy
+  cliphist
+)
+
+# Greeter (installed; you’ll manage config in your dotfiles)
 GREETER_PKGS=( greetd tuigreet )
 
 ALL_PKGS=(
@@ -79,23 +96,18 @@ ALL_PKGS=(
   "${POLKIT_PKGS[@]}"
   "${MEDIA_PKGS[@]}"
   "${POWER_QOL_PKGS[@]}"
+  "${LAUNCHER_UTIL_PKGS[@]}"
   "${GREETER_PKGS[@]}"
 )
 
-EXTRA_CONFIG_TOOLS=( wofi swappy hyprpicker cliphist )
-
-echo "==> Installing core packages..."
+echo "==> Installing packages..."
 apt_install "${ALL_PKGS[@]}"
-
-echo "==> Installing extras (best effort)..."
-try_install "${EXTRA_CONFIG_TOOLS[@]}"
 
 # --- Enable core services ----------------------------------------------------
 echo "==> Enabling services..."
 systemctl enable --now NetworkManager
 systemctl enable --now bluetooth || true
 systemctl enable --now greetd || true
-
 # PipeWire/WirePlumber are user units; they’ll start on demand.
 
 # --- Flatpak: add Flathub ----------------------------------------------------

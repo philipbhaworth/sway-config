@@ -17,7 +17,8 @@ During the Debian installer:
 ```bash
 sudo apt update && sudo apt install -y \
   build-essential git curl wget unzip p7zip-full \
-  htop vim tmux stow tree jq fzf ripgrep bat fd-find
+  htop vim tmux stow tree jq fzf ripgrep bat fd-find \
+  firefox-esr
 ```
 
 ---
@@ -77,7 +78,7 @@ sudo apt install -y \
 ```bash
 sudo apt install -y \
   pipewire pipewire-audio wireplumber libspa-0.2-bluetooth \
-  alsa-utils sway-notification-center
+  alsa-utils sway-notification-center pavucontrol libnotify-bin
 ```
 
 ---
@@ -118,7 +119,25 @@ sudo apt install -y \
 
 ---
 
-## 13. Flatpak
+## 13. Launchers & Utilities
+
+```bash
+sudo apt install -y \
+  wofi wlogout swappy cliphist
+```
+
+---
+
+## 14. Power & Display
+
+```bash
+sudo apt install -y \
+  brightnessctl gammastep
+```
+
+---
+
+## 15. Flatpak
 
 ```bash
 sudo apt install -y flatpak
@@ -127,7 +146,7 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 
 ---
 
-## 14. Post-install Setup
+## 16. Post-install Setup
 
 ### Aliases for Debian naming
 
@@ -212,8 +231,6 @@ exec --no-startup-id waybar
 
 - **Power management & brightness:**
   ```bash
-  sudo apt install -y brightnessctl gammastep
-
   # Lower brightness to 50%
   brightnessctl set 50%
 
@@ -242,6 +259,7 @@ exec --no-startup-id waybar
 - **ripgrep (rg)** – Fast text search across files.  
 - **bat** – `cat` alternative with syntax highlighting (`batcat` binary).  
 - **fd-find** – Fast file search (`fdfind` binary).  
+- **firefox-esr** – Web browser (for GitHub and general browsing).  
 
 ### Sway & Wayland
 - **sway** – Wayland tiling window manager.  
@@ -289,6 +307,8 @@ exec --no-startup-id waybar
 - **libspa-0.2-bluetooth** – Bluetooth audio support.  
 - **alsa-utils** – ALSA mixer and sound tools.  
 - **sway-notification-center (swaync)** – Wayland notification daemon.  
+- **pavucontrol** – GTK volume control/mixer.  
+- **libnotify-bin** – Command-line tool `notify-send` for desktop notifications.  
 
 ### Bluetooth
 - **bluez** – Linux Bluetooth stack.  
@@ -301,6 +321,25 @@ exec --no-startup-id waybar
 - **qimgv** – Lightweight image viewer.  
 - **mpv** – Media player.  
 
+### Launchers & Utilities
+- **wofi** – Wayland application launcher (used for Mod+D).  
+- **wlogout** – Logout/power menu for Wayland.  
+- **swappy** – Wayland screenshot editor.  
+- **cliphist** – Clipboard manager for wl-clipboard.  
+
+### Power & Display
+- **brightnessctl** – Control screen backlight brightness.  
+- **gammastep** – Night-light style color temperature adjustment.  
+
 ### Flatpak
 - **flatpak** – Universal package manager for sandboxed apps.  
 - **flathub remote** – Popular Flatpak repository with desktop apps.  
+- **flathub apps**
+  - Eyedropper
+  - Vesktop
+  - Obsidian
+  - Signal Desktop   
+
+### Apps Installed
+- **VS Codium** - https://vscodium.com/
+- 

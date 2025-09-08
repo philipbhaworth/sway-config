@@ -7,7 +7,7 @@
 
   "modules-left": ["sway/workspaces"],
   "modules-center": [],
-  "modules-right": ["tray", "cpu", "memory", "temperature", "pulseaudio", "network", "battery", "clock", "custom/wlogout"],
+  "modules-right": ["tray", "cpu", "memory", "temperature", "wireplumber", "network", "battery", "clock", "custom/wlogout"],
 
   "sway/workspaces": {
     "disable-scroll": true,
@@ -120,10 +120,8 @@
     "on-click": "kitty -e nmtui"
   },
 
-  "pulseaudio": {
+  "wireplumber": {
     "format": "{icon} {volume}%",
-    "format-bluetooth": "󰂰 {volume}%",
-    "format-bluetooth-muted": "󰂲 {icon}",
     "format-muted": "󰝟",
     "format-icons": {
       "headphone": "󰋋",
@@ -135,8 +133,8 @@
       "default": ["󰕿", "󰖀", "󰕾"]
     },
     "on-click": "pavucontrol",
-    "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
-    "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +2%",
-    "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -2%"
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
   }
 }

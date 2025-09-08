@@ -98,8 +98,8 @@
 /*@define-color battery-critical-color @red; */
 /*@define-color network-color @blue; */
 /*@define-color network-disconnected-color @red; */
-/*@define-color pulseaudio-color @orange; */
-/*@define-color pulseaudio-muted-color @red; */
+/*@define-color audio-color @orange; */
+/*@define-color audio-muted-color @red; */
 /*@define-color backlight-color @yellow; */
 /*@define-color disk-color @cyan; */
 /*@define-color uptime-color @green; */
@@ -124,8 +124,8 @@
 @define-color battery-critical-color @red;
 @define-color network-color @foreground;
 @define-color network-disconnected-color @red;
-@define-color pulseaudio-color @foreground;
-@define-color pulseaudio-muted-color @red;
+@define-color audio-color @foreground;
+@define-color audio-muted-color @red;
 @define-color backlight-color @foreground;
 @define-color disk-color @foreground;
 @define-color uptime-color @foreground;
@@ -151,7 +151,7 @@ window#waybar {
 
 /* Common module styling with border-bottom */
 #mode, #mpd, #custom-weather, #custom-playerctl, #clock, #cpu,
-#memory, #temperature, #battery, #network, #pulseaudio,
+#memory, #temperature, #battery, #network, #wireplumber,
 #backlight, #disk, #custom-uptime, #custom-updates, #custom-quote,
 #idle_inhibitor, #tray, #custom-wlogout {
     padding: 0 10px;
@@ -284,14 +284,14 @@ window#waybar {
     border-bottom-color: @network-disconnected-color;
 }
 
-#pulseaudio {
-    color: @pulseaudio-color;
-    border-bottom-color: @pulseaudio-color;
+#wireplumber {
+    color: @audio-color;
+    border-bottom-color: @audio-color;
 }
 
-#pulseaudio.muted {
-    color: @pulseaudio-muted-color;
-    border-bottom-color: @pulseaudio-muted-color;
+#wireplumber.muted {
+    color: @audio-muted-color;
+    border-bottom-color: @audio-muted-color;
 }
 
 #backlight {

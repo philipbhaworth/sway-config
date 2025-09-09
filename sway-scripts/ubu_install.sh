@@ -1,109 +1,87 @@
 #!/usr/bin/env bash
-# package_checker.sh
-# Check which packages from your install script are actually installed
+# install.sh
+# Debian 13 (trixie) / Ubuntu 22.04 (jammy) / 24.04 (noble)
+# Minimal Sway + Wayland tooling installer (no config writes), with Flameshot/Kitty.
+# Notes:
+# - No grim/slurp (you requested Flameshot). Keep xwayland for Flameshot.
+# - Handles package naming differences across Debian/Ubuntu.
+# - Tries both "sway-notification-center" and "swaynotificationcenter".
+# - Does not write user configs; assumes dotfiles.
 
 set -euo pipefail
 
-# ----- Config: which user to check user services for -------------------------
-TARGET_USER="${SUDO_USER:-$USER}"
+export DEBIAN_FRONTEND=noninteractive
+USER_NAME="${SUDO_USER:-${USER}}"
 
-# ----- Colors ----------------------------------------------------------------
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
+if [[ $EUID -ne 0 ]]; then
+  echo "Please run as root (e.g.,: sudo $0)"; exit 1
+fi
 
-echo -e "${BLUE}Package Installation Status Check${NC}"
-echo "=================================="
+if ! command -v apt-get >/dev/null 2>&1; then
+  echo "apt-get not found; this script targets Debian/Ubuntu."; exit 1
+fi
 
-# ----- Helper: test if any of the alternatives is installed ------------------
-# Accepts entries like: "firefox-esr|firefox" or "sway-notification-center|swaynotificationcenter"
-is_installed() {
-  local spec="$1"
-  local IFS='|'
-  read -r -a ALTS <<< "$spec"
-  for alt in "${ALTS[@]}"; do
-    if dpkg-query -W -f='${Status}' "$alt" 2>/dev/null | grep -q "install ok installed"; then
-      return 0
-    fi
-  done
-  return 1
+# Detect distro/codename
+# shellcheck disable=SC1091
+. /etc/os-release
+DISTRO_ID="${ID:-}"
+CODENAME="${VERSION_CODENAME:-}"
+
+echo "==> Detected: ID=${DISTRO_ID}, CODENAME=${CODENAME}"
+
+apt_install() {
+  apt-get update
+  apt-get install -y --no-install-recommends "$@"
 }
 
-# Pretty printer
-check_package() {
-  local spec="$1"
-  if is_installed "$spec"; then
-    echo -e "${GREEN}✓${NC} $spec"
-    return 0
-  else
-    echo -e "${RED}✗${NC} $spec"
-    return 1
+pkg_available() {
+  # Returns 0 if candidate exists, otherwise 1
+  local pkg="$1"
+  # apt-cache policy returns "Candidate: (none)" when missing
+  local cand
+  cand="$(apt-cache policy "$pkg" | awk -F': ' '/Candidate:/ {print $2}' | head -n1 || true)"
+  [[ -n "${cand:-}" && "${cand}" != "(none)" ]]
+}
+
+install_if_available() {
+  # Installs only the packages that exist; prints warnings for missing
+  local want=("$@")
+  local have=()
+  local miss=()
+  for p in "${want[@]}"; do
+    if pkg_available "$p"; then
+      have+=("$p")
+    else
+      miss+=("$p")
+    fi
+  done
+  if [[ ${#have[@]} -gt 0 ]]; then
+    echo "==> Installing ${#have[@]} packages..."
+    apt_install "${have[@]}"
+  fi
+  if [[ ${#miss[@]} -gt 0 ]]; then
+    echo "==> Skipping unavailable packages: ${miss[*]}"
   fi
 }
 
-check_package_group() {
-  local group_name="$1"; shift
-  local packages=("$@")
-  local missing=()
-
-  echo -e "\n${BLUE}=== $group_name ===${NC}"
-  for p in "${packages[@]}"; do
-    if ! check_package "$p"; then
-      missing+=("$p")
-    fi
-  done
-
-  if ((${#missing[@]} > 0)); then
-    echo -e "${YELLOW}Missing ${#missing[@]} packages from $group_name${NC}"
-    return 1
-  else
-    echo -e "${GREEN}All packages installed for $group_name${NC}"
-    return 0
-  fi
-}
-
-# Generate install commands for missing packages; pick the first available alt
-generate_install_commands() {
-  local group_name="$1"; shift
-  local packages=("$@")
-  local to_install=()
-
-  for spec in "${packages[@]}"; do
-    if is_installed "$spec"; then
-      continue
-    fi
-    local chosen=""
-    IFS='|' read -r -a ALTS <<< "$spec"
-    for alt in "${ALTS[@]}"; do
-      if apt-cache policy "$alt" >/dev/null 2>&1 && apt-cache policy "$alt" | grep -q 'Candidate:'; then
-        if ! apt-cache policy "$alt" | grep -q 'Candidate: (none)'; then
-          chosen="$alt"; break
-        fi
-      fi
-    done
-    [[ -z "$chosen" ]] && chosen="${ALTS[0]}"
-    to_install+=("$chosen")
-  done
-
-  if ((${#to_install[@]} > 0)); then
-    echo -e "\n${YELLOW}To install missing $group_name packages:${NC}"
-    echo "sudo apt install -y ${to_install[*]}"
-  fi
-}
-
-# ----- Package groups (with sensible alternates) ------------------------------
+# ---------------- Package sets (common) ----------------
 BASE_PKGS=(
   build-essential git curl wget unzip p7zip-full
   htop vim tmux stow tree jq fzf ripgrep bat fd-find
-  "firefox-esr|firefox"
 )
 
-# Prefer Flameshot; leave grim/slurp if you also want native Wayland capture
+# Browser differs: Debian has firefox-esr; Ubuntu typically "firefox" (Snap-backed)
+DEBIAN_BROWSER=( firefox-esr )
+UBUNTU_BROWSER=( firefox )
+
 SWAY_WAYLAND_PKGS=(
-  sway swaylock swayidle swaybg waybar wl-clipboard xwayland
-  "flameshot|grim"
-  slurp
+  sway swaylock swayidle swaybg waybar
+  wl-clipboard xwayland
+  # NOTE: grim/slurp intentionally omitted (Flameshot chosen)
 )
 
 PORTAL_PKGS=( xdg-desktop-portal xdg-desktop-portal-wlr )
+
 TERM_EDITOR_PKGS=( foot kitty pluma )
 
 FILES_STORAGE_PKGS=(
@@ -119,89 +97,148 @@ FONTS_THEME_PKGS=(
   fonts-font-awesome nwg-look
 )
 
-# sway-notification-center package name may vary
-AUDIO_NOTIFY_PKGS=(
-  pipewire pipewire-audio wireplumber libspa-0.2-bluetooth
-  alsa-utils "sway-notification-center|swaynotificationcenter"
+# Audio differs: Debian metapkg "pipewire-audio"; Ubuntu uses "pipewire-pulse"
+DEBIAN_AUDIO_PKGS=( pipewire pipewire-audio wireplumber )
+UBUNTU_AUDIO_PKGS=( pipewire pipewire-pulse wireplumber )
+
+AUDIO_COMMON_PKGS=(
+  libspa-0.2-bluetooth
+  alsa-utils
   pavucontrol
   libnotify-bin
 )
+
+# sway-notification-center package name varies by repo; we’ll try both.
+SWAYNC_NAMES=( sway-notification-center swaynotificationcenter )
 
 BLUETOOTH_PKGS=( bluez blueman )
 NETWORK_PKGS=( network-manager )
 POLKIT_PKGS=( lxqt-policykit )
 MEDIA_PKGS=( qimgv mpv )
 POWER_QOL_PKGS=( brightnessctl gammastep )
+
+LAUNCHER_UTIL_PKGS=(
+  wofi
+  wlogout
+  swappy
+  cliphist
+  flameshot   # Your chosen screenshot tool
+)
+
 GREETER_PKGS=( greetd tuigreet )
+EXTRA_RUNTIME_PKGS=( seatd ) # Helpful when running compositors without a full DM
 
-EXTRA_CONFIG_TOOLS=( wofi wlogout swappy cliphist hyprpicker )
+# ---------------- Build final package list by distro ----------------
+ALL_PKGS=(
+  "${BASE_PKGS[@]}"
+  "${SWAY_WAYLAND_PKGS[@]}"
+  "${PORTAL_PKGS[@]}"
+  "${TERM_EDITOR_PKGS[@]}"
+  "${FILES_STORAGE_PKGS[@]}"
+  "${FONTS_THEME_PKGS[@]}"
+  "${BLUETOOTH_PKGS[@]}"
+  "${NETWORK_PKGS[@]}"
+  "${POLKIT_PKGS[@]}"
+  "${MEDIA_PKGS[@]}"
+  "${POWER_QOL_PKGS[@]}"
+  "${LAUNCHER_UTIL_PKGS[@]}"
+  "${GREETER_PKGS[@]}"
+  "${EXTRA_RUNTIME_PKGS[@]}"
+)
 
-# Additional suggestions
-MISSING_COMMON_PKGS=( pwvucontrol )
+case "${DISTRO_ID}" in
+  debian)
+    ALL_PKGS+=( "${DEBIAN_BROWSER[@]}" )
+    ALL_PKGS+=( "${DEBIAN_AUDIO_PKGS[@]}" )
+    ALL_PKGS+=( "${AUDIO_COMMON_PKGS[@]}" )
+    ;;
+  ubuntu)
+    ALL_PKGS+=( "${UBUNTU_BROWSER[@]}" )
+    ALL_PKGS+=( "${UBUNTU_AUDIO_PKGS[@]}" )
+    ALL_PKGS+=( "${AUDIO_COMMON_PKGS[@]}" )
+    ;;
+  *)
+    echo "Warning: unrecognized distro ID '${DISTRO_ID}'. Proceeding with Debian-like defaults."
+    ALL_PKGS+=( "${DEBIAN_BROWSER[@]}" )
+    ALL_PKGS+=( "${DEBIAN_AUDIO_PKGS[@]}" )
+    ALL_PKGS+=( "${AUDIO_COMMON_PKGS[@]}" )
+    ;;
+esac
 
-# ----- Checks ----------------------------------------------------------------
-check_package_group "Base Packages" "${BASE_PKGS[@]}"
-check_package_group "Sway/Wayland" "${SWAY_WAYLAND_PKGS[@]}"
-check_package_group "Desktop Portals" "${PORTAL_PKGS[@]}"
-check_package_group "Terminal/Editor" "${TERM_EDITOR_PKGS[@]}"
-check_package_group "Files/Storage" "${FILES_STORAGE_PKGS[@]}"
-check_package_group "Fonts/Themes" "${FONTS_THEME_PKGS[@]}"
-check_package_group "Audio/Notifications" "${AUDIO_NOTIFY_PKGS[@]}"
-check_package_group "Bluetooth" "${BLUETOOTH_PKGS[@]}"
-check_package_group "Network" "${NETWORK_PKGS[@]}"
-check_package_group "Polkit" "${POLKIT_PKGS[@]}"
-check_package_group "Media" "${MEDIA_PKGS[@]}"
-check_package_group "Power/QOL" "${POWER_QOL_PKGS[@]}"
-check_package_group "Greeter" "${GREETER_PKGS[@]}"
-check_package_group "Extra Tools" "${EXTRA_CONFIG_TOOLS[@]}"
-check_package_group "Additional Useful" "${MISSING_COMMON_PKGS[@]}"
+echo "==> Installing core package sets (this may take a while)..."
+install_if_available "${ALL_PKGS[@]}"
 
-echo -e "\n${BLUE}=== INSTALL COMMANDS FOR MISSING PACKAGES ===${NC}"
-generate_install_commands "Base Packages" "${BASE_PKGS[@]}"
-generate_install_commands "Sway/Wayland" "${SWAY_WAYLAND_PKGS[@]}"
-generate_install_commands "Desktop Portals" "${PORTAL_PKGS[@]}"
-generate_install_commands "Terminal/Editor" "${TERM_EDITOR_PKGS[@]}"
-generate_install_commands "Files/Storage" "${FILES_STORAGE_PKGS[@]}"
-generate_install_commands "Fonts/Themes" "${FONTS_THEME_PKGS[@]}"
-generate_install_commands "Audio/Notifications" "${AUDIO_NOTIFY_PKGS[@]}"
-generate_install_commands "Bluetooth" "${BLUETOOTH_PKGS[@]}"
-generate_install_commands "Network" "${NETWORK_PKGS[@]}"
-generate_install_commands "Polkit" "${POLKIT_PKGS[@]}"
-generate_install_commands "Media" "${MEDIA_PKGS[@]}"
-generate_install_commands "Power/QOL" "${POWER_QOL_PKGS[@]}"
-generate_install_commands "Greeter" "${GREETER_PKGS[@]}"
-generate_install_commands "Extra Tools" "${EXTRA_CONFIG_TOOLS[@]}"
-generate_install_commands "Additional Useful" "${MISSING_COMMON_PKGS[@]}"
-
-# ----- Services --------------------------------------------------------------
-echo -e "\n${BLUE}=== SERVICES STATUS (system) ===${NC}"
-services=("NetworkManager" "bluetooth" "greetd")
-for service in "${services[@]}"; do
-  if systemctl is-enabled "$service" >/dev/null 2>&1; then
-    if systemctl is-active "$service" >/dev/null 2>&1; then
-      echo -e "${GREEN}✓${NC} $service (enabled and running)"
-    else
-      echo -e "${YELLOW}!${NC} $service (enabled but not running)"
-    fi
-  else
-    echo -e "${RED}✗${NC} $service (not enabled)"
+# Try sway-notification-center under either common name
+for swync in "${SWAYNC_NAMES[@]}"; do
+  if pkg_available "$swync"; then
+    echo "==> Installing notification daemon: $swync"
+    apt_install "$swync"
+    break
   fi
 done
 
-# PipeWire/WirePlumber are user services; check for the desktop user, not root.
-echo -e "\n${BLUE}=== AUDIO SYSTEM CHECK (user: $TARGET_USER) ===${NC}"
-user_services=("pipewire" "pipewire-pulse" "wireplumber")
-for service in "${user_services[@]}"; do
-  if sudo -u "$TARGET_USER" systemctl --user is-active "$service" >/dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC} $service (running)"
-  else
-    echo -e "${RED}✗${NC} $service (not running)"
+# ---------------- Enable core services ----------------
+echo "==> Enabling services..."
+systemctl enable --now NetworkManager || true
+systemctl enable --now bluetooth || true
+systemctl enable --now greetd || true
+
+# seatd helps when not running a full display manager
+systemctl enable --now seatd || true
+# Add the main user to common input/video seats so rootless compositors work better
+for grp in video input seatd; do
+  if getent group "$grp" >/dev/null; then
+    usermod -aG "$grp" "$USER_NAME" || true
   fi
 done
 
-echo -e "\n${YELLOW}Tip:${NC} If user services don't start outside a login session, consider:"
-echo "  loginctl enable-linger $TARGET_USER"
-echo "  # Then log out/in or start a proper user session (e.g., Sway or a DM)."
+# PipeWire/WirePlumber are user units; they’ll auto-start on demand.
+# If you want to force-enable for the current user later:
+#   systemctl --user enable --now pipewire pipewire-pulse wireplumber
 
-echo -e "\n${YELLOW}Audio controls you may want installed:${NC}"
-echo "sudo apt install -y pavucontrol pwvucontrol"
+# ---------------- Flatpak: add Flathub (if flatpak exists) -------------
+if command -v flatpak >/dev/null 2>&1; then
+  if ! sudo -u "$USER_NAME" flatpak remotes | grep -q '^flathub'; then
+    echo "==> Adding Flathub remote for user: $USER_NAME"
+    sudo -u "$USER_NAME" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  fi
+fi
+
+cat <<'EONEXT'
+==> Install complete.
+
+Next steps:
+  1) (Optional) Convenience aliases on Ubuntu/Debian:
+       echo "alias bat='batcat'" >> ~/.bashrc
+       echo "alias fd='fdfind'"   >> ~/.bashrc
+
+  2) Launch the browser to sign into services:
+       firefox    # Debian uses ESR; Ubuntu installs Firefox (Snap-backed).
+
+  3) Clone your dotfiles and stow configs (example):
+       git clone git@github.com:<you>/<dotfiles>.git ~/.dotfiles
+       cd ~/.dotfiles
+       stow sway waybar foot kitty   # adjust to your repo layout
+
+  4) Starting Sway
+     - If using greetd/tuigreet (installed/enabled), log in via the greeter.
+     - Or add this to ~/.bash_profile for TTY1 autostart:
+         if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = "1" ]; then
+           exec dbus-run-session -- sway
+         fi
+
+  5) Bind Flameshot + set Kitty in your Sway config (~/.config/sway/config):
+       set $term kitty
+       bindsym $mod+Return exec $term
+       exec --no-startup-id flameshot
+       bindsym Print        exec "flameshot gui"
+       bindsym Shift+Print  exec "flameshot full -p ~/Pictures"
+       bindsym Ctrl+Print   exec "flameshot gui -c"
+       mkdir -p ~/Pictures
+
+Notes:
+  - grim/slurp omitted by request; Flameshot (via XWayland) is your screenshot tool.
+  - If you ever need native Wayland capture, install grim slurp swappy and add separate binds.
+  - On Ubuntu, audio stack is pipewire + pipewire-pulse + wireplumber.
+  - On Debian, audio stack is pipewire + pipewire-audio + wireplumber.
+EONEXT

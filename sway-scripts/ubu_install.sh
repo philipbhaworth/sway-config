@@ -1,54 +1,109 @@
 #!/usr/bin/env bash
-# install.sh
-# Debian 13 (trixie) minimal Sway + Wayland tooling installer (no config writes)
-# Updated: use Flameshot (XWayland) for screenshots; grim/slurp removed by default.
+# package_checker.sh
+# Check which packages from your install script are actually installed
 
 set -euo pipefail
 
-export DEBIAN_FRONTEND=noninteractive
-REQUIRED_DIST="trixie"   # Debian 13
-USER_NAME="${SUDO_USER:-${USER}}"
+# ----- Config: which user to check user services for -------------------------
+TARGET_USER="${SUDO_USER:-$USER}"
 
-# --- Sanity checks -----------------------------------------------------------
-if [[ $EUID -ne 0 ]]; then
-  echo "Please run as root (e.g.,: sudo $0)"; exit 1
-fi
+# ----- Colors ----------------------------------------------------------------
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
 
-if ! command -v apt-get >/dev/null 2>&1; then
-  echo "apt-get not found; this script targets Debian-based systems."; exit 1
-fi
+echo -e "${BLUE}Package Installation Status Check${NC}"
+echo "=================================="
 
-# shellcheck disable=SC1091
-. /etc/os-release
-CURRENT_CODENAME="${VERSION_CODENAME:-}"
-
-if [[ -n "$REQUIRED_DIST" && "$CURRENT_CODENAME" != "$REQUIRED_DIST" ]]; then
-  echo "Warning: target is Debian '$REQUIRED_DIST', but this system is '$CURRENT_CODENAME'. Continuing in 5s..."
-  sleep 5
-fi
-
-apt_install() {
-  apt-get update
-  apt-get install -y --no-install-recommends "$@"
+# ----- Helper: test if any of the alternatives is installed ------------------
+# Accepts entries like: "firefox-esr|firefox" or "sway-notification-center|swaynotificationcenter"
+is_installed() {
+  local spec="$1"
+  local IFS='|'
+  read -r -a ALTS <<< "$spec"
+  for alt in "${ALTS[@]}"; do
+    if dpkg-query -W -f='${Status}' "$alt" 2>/dev/null | grep -q "install ok installed"; then
+      return 0
+    fi
+  done
+  return 1
 }
 
-# --- Package sets ------------------------------------------------------------
+# Pretty printer
+check_package() {
+  local spec="$1"
+  if is_installed "$spec"; then
+    echo -e "${GREEN}✓${NC} $spec"
+    return 0
+  else
+    echo -e "${RED}✗${NC} $spec"
+    return 1
+  fi
+}
+
+check_package_group() {
+  local group_name="$1"; shift
+  local packages=("$@")
+  local missing=()
+
+  echo -e "\n${BLUE}=== $group_name ===${NC}"
+  for p in "${packages[@]}"; do
+    if ! check_package "$p"; then
+      missing+=("$p")
+    fi
+  done
+
+  if ((${#missing[@]} > 0)); then
+    echo -e "${YELLOW}Missing ${#missing[@]} packages from $group_name${NC}"
+    return 1
+  else
+    echo -e "${GREEN}All packages installed for $group_name${NC}"
+    return 0
+  fi
+}
+
+# Generate install commands for missing packages; pick the first available alt
+generate_install_commands() {
+  local group_name="$1"; shift
+  local packages=("$@")
+  local to_install=()
+
+  for spec in "${packages[@]}"; do
+    if is_installed "$spec"; then
+      continue
+    fi
+    local chosen=""
+    IFS='|' read -r -a ALTS <<< "$spec"
+    for alt in "${ALTS[@]}"; do
+      if apt-cache policy "$alt" >/dev/null 2>&1 && apt-cache policy "$alt" | grep -q 'Candidate:'; then
+        if ! apt-cache policy "$alt" | grep -q 'Candidate: (none)'; then
+          chosen="$alt"; break
+        fi
+      fi
+    done
+    [[ -z "$chosen" ]] && chosen="${ALTS[0]}"
+    to_install+=("$chosen")
+  done
+
+  if ((${#to_install[@]} > 0)); then
+    echo -e "\n${YELLOW}To install missing $group_name packages:${NC}"
+    echo "sudo apt install -y ${to_install[*]}"
+  fi
+}
+
+# ----- Package groups (with sensible alternates) ------------------------------
 BASE_PKGS=(
   build-essential git curl wget unzip p7zip-full
   htop vim tmux stow tree jq fzf ripgrep bat fd-find
-  firefox-esr
+  "firefox-esr|firefox"
 )
 
-# Note: grim/slurp removed because Flameshot will be used for screenshots.
+# Prefer Flameshot; leave grim/slurp if you also want native Wayland capture
 SWAY_WAYLAND_PKGS=(
   sway swaylock swayidle swaybg waybar wl-clipboard xwayland
+  "flameshot|grim"
+  slurp
 )
 
-# If you want native Wayland screenshot tools as a fallback, uncomment:
-# WAYLAND_SCREENSHOT_FALLBACK_PKGS=( grim slurp )
-
 PORTAL_PKGS=( xdg-desktop-portal xdg-desktop-portal-wlr )
-
 TERM_EDITOR_PKGS=( foot kitty pluma )
 
 FILES_STORAGE_PKGS=(
@@ -64,9 +119,10 @@ FONTS_THEME_PKGS=(
   fonts-font-awesome nwg-look
 )
 
+# sway-notification-center package name may vary
 AUDIO_NOTIFY_PKGS=(
   pipewire pipewire-audio wireplumber libspa-0.2-bluetooth
-  alsa-utils sway-notification-center
+  alsa-utils "sway-notification-center|swaynotificationcenter"
   pavucontrol
   libnotify-bin
 )
@@ -76,98 +132,76 @@ NETWORK_PKGS=( network-manager )
 POLKIT_PKGS=( lxqt-policykit )
 MEDIA_PKGS=( qimgv mpv )
 POWER_QOL_PKGS=( brightnessctl gammastep )
-
-# Launchers / desktop utilities
-LAUNCHER_UTIL_PKGS=(
-  wofi
-  wlogout
-  swappy
-  cliphist
-)
-
-# Screenshots (your preference)
-SCREENSHOT_PKGS=( flameshot )
-
-# Greeter (installed; you’ll manage config in your dotfiles)
 GREETER_PKGS=( greetd tuigreet )
 
-ALL_PKGS=(
-  "${BASE_PKGS[@]}"
-  "${SWAY_WAYLAND_PKGS[@]}"
-  "${PORTAL_PKGS[@]}"
-  "${TERM_EDITOR_PKGS[@]}"
-  "${FILES_STORAGE_PKGS[@]}"
-  "${FONTS_THEME_PKGS[@]}"
-  "${AUDIO_NOTIFY_PKGS[@]}"
-  "${BLUETOOTH_PKGS[@]}"
-  "${NETWORK_PKGS[@]}"
-  "${POLKIT_PKGS[@]}"
-  "${MEDIA_PKGS[@]}"
-  "${POWER_QOL_PKGS[@]}"
-  "${LAUNCHER_UTIL_PKGS[@]}"
-  "${SCREENSHOT_PKGS[@]}"
-  "${GREETER_PKGS[@]}"
-  # "${WAYLAND_SCREENSHOT_FALLBACK_PKGS[@]}"  # uncomment if desired
-)
+EXTRA_CONFIG_TOOLS=( wofi wlogout swappy cliphist hyprpicker )
 
-echo "==> Installing packages..."
-apt_install "${ALL_PKGS[@]}"
+# Additional suggestions
+MISSING_COMMON_PKGS=( pwvucontrol )
 
-# --- Enable core services ----------------------------------------------------
-echo "==> Enabling services..."
-systemctl enable --now NetworkManager
-systemctl enable --now bluetooth || true
-systemctl enable --now greetd || true
-# PipeWire/WirePlumber are user units; they’ll start on demand.
+# ----- Checks ----------------------------------------------------------------
+check_package_group "Base Packages" "${BASE_PKGS[@]}"
+check_package_group "Sway/Wayland" "${SWAY_WAYLAND_PKGS[@]}"
+check_package_group "Desktop Portals" "${PORTAL_PKGS[@]}"
+check_package_group "Terminal/Editor" "${TERM_EDITOR_PKGS[@]}"
+check_package_group "Files/Storage" "${FILES_STORAGE_PKGS[@]}"
+check_package_group "Fonts/Themes" "${FONTS_THEME_PKGS[@]}"
+check_package_group "Audio/Notifications" "${AUDIO_NOTIFY_PKGS[@]}"
+check_package_group "Bluetooth" "${BLUETOOTH_PKGS[@]}"
+check_package_group "Network" "${NETWORK_PKGS[@]}"
+check_package_group "Polkit" "${POLKIT_PKGS[@]}"
+check_package_group "Media" "${MEDIA_PKGS[@]}"
+check_package_group "Power/QOL" "${POWER_QOL_PKGS[@]}"
+check_package_group "Greeter" "${GREETER_PKGS[@]}"
+check_package_group "Extra Tools" "${EXTRA_CONFIG_TOOLS[@]}"
+check_package_group "Additional Useful" "${MISSING_COMMON_PKGS[@]}"
 
-# --- Flatpak: add Flathub ----------------------------------------------------
-if command -v flatpak >/dev/null 2>&1; then
-  if ! sudo -u "$USER_NAME" flatpak remotes | grep -q '^flathub'; then
-    echo "==> Adding Flathub remote for user: $USER_NAME"
-    sudo -u "$USER_NAME" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+echo -e "\n${BLUE}=== INSTALL COMMANDS FOR MISSING PACKAGES ===${NC}"
+generate_install_commands "Base Packages" "${BASE_PKGS[@]}"
+generate_install_commands "Sway/Wayland" "${SWAY_WAYLAND_PKGS[@]}"
+generate_install_commands "Desktop Portals" "${PORTAL_PKGS[@]}"
+generate_install_commands "Terminal/Editor" "${TERM_EDITOR_PKGS[@]}"
+generate_install_commands "Files/Storage" "${FILES_STORAGE_PKGS[@]}"
+generate_install_commands "Fonts/Themes" "${FONTS_THEME_PKGS[@]}"
+generate_install_commands "Audio/Notifications" "${AUDIO_NOTIFY_PKGS[@]}"
+generate_install_commands "Bluetooth" "${BLUETOOTH_PKGS[@]}"
+generate_install_commands "Network" "${NETWORK_PKGS[@]}"
+generate_install_commands "Polkit" "${POLKIT_PKGS[@]}"
+generate_install_commands "Media" "${MEDIA_PKGS[@]}"
+generate_install_commands "Power/QOL" "${POWER_QOL_PKGS[@]}"
+generate_install_commands "Greeter" "${GREETER_PKGS[@]}"
+generate_install_commands "Extra Tools" "${EXTRA_CONFIG_TOOLS[@]}"
+generate_install_commands "Additional Useful" "${MISSING_COMMON_PKGS[@]}"
+
+# ----- Services --------------------------------------------------------------
+echo -e "\n${BLUE}=== SERVICES STATUS (system) ===${NC}"
+services=("NetworkManager" "bluetooth" "greetd")
+for service in "${services[@]}"; do
+  if systemctl is-enabled "$service" >/dev/null 2>&1; then
+    if systemctl is-active "$service" >/dev/null 2>&1; then
+      echo -e "${GREEN}✓${NC} $service (enabled and running)"
+    else
+      echo -e "${YELLOW}!${NC} $service (enabled but not running)"
+    fi
+  else
+    echo -e "${RED}✗${NC} $service (not enabled)"
   fi
-fi
+done
 
-# --- Quality of Life: ensure ~/Pictures exists for Flameshot -----------------
-sudo -u "$USER_NAME" mkdir -p "/home/$USER_NAME/Pictures"
+# PipeWire/WirePlumber are user services; check for the desktop user, not root.
+echo -e "\n${BLUE}=== AUDIO SYSTEM CHECK (user: $TARGET_USER) ===${NC}"
+user_services=("pipewire" "pipewire-pulse" "wireplumber")
+for service in "${user_services[@]}"; do
+  if sudo -u "$TARGET_USER" systemctl --user is-active "$service" >/dev/null 2>&1; then
+    echo -e "${GREEN}✓${NC} $service (running)"
+  else
+    echo -e "${RED}✗${NC} $service (not running)"
+  fi
+done
 
-cat <<'EONEXT'
-==> Install complete.
+echo -e "\n${YELLOW}Tip:${NC} If user services don't start outside a login session, consider:"
+echo "  loginctl enable-linger $TARGET_USER"
+echo "  # Then log out/in or start a proper user session (e.g., Sway or a DM)."
 
-Next steps:
-  1) Generate SSH keys:
-       ssh-keygen -t ed25519 -C "your_email@example.com"
-     Then copy your public key:
-       cat ~/.ssh/id_ed25519.pub
-     And add it to your GitHub account via the browser.
-
-  2) Launch the browser to add keys / sign in:
-       firefox-esr
-
-  3) Clone your dotfiles repo and stow configs (example):
-       git clone git@github.com:<you>/<dotfiles>.git ~/.dotfiles
-       cd ~/.dotfiles
-       stow sway waybar foot kitty   # adjust to your repo layout
-
-  4) Sway keybindings for Kitty + Flameshot (append to ~/.config/sway/config):
-       set $term kitty
-       bindsym $mod+Return exec $term
-
-       # Flameshot (XWayland) bindings
-       bindsym Print exec "flameshot gui"
-       bindsym Shift+Print exec "flameshot full -p ~/Pictures"
-       bindsym Ctrl+Print exec "flameshot gui -c"
-
-       # Autostart Flameshot
-       exec --no-startup-id flameshot
-
-     Optional native Wayland fallback (if you installed grim/slurp):
-       bindsym $mod+Print exec "grim -g \"$(slurp)\" - | wl-copy"
-
-  5) Log out or reboot into Sway (greetd/tuigreet is installed and enabled).
-
-Notes:
-  - Flameshot runs via XWayland; for most setups this works great. If you later
-    want pixel-perfect Wayland-native capture, install 'grim' and 'slurp' and
-    bind them separately as shown above.
-EONEXT
+echo -e "\n${YELLOW}Audio controls you may want installed:${NC}"
+echo "sudo apt install -y pavucontrol pwvucontrol"

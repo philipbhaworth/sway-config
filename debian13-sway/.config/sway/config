@@ -13,8 +13,24 @@ set $filebrowser thunar
 set $menu wofi --show drun
 set $browser firefox
 set $chat vesktop
-set $power-menu ~/sway-config/sway-scripts/wofi-power.sh
-set $wall ~/wallpapers/walls_02.png
+
+# Path management
+set $scripts ~/.config/sway/scripts
+set $wallpapers ~/.config/sway/wallpapers
+set $power-menu $scripts/wofi-power.sh
+set $wall $wallpapers/walls_02.png
+
+# Workspace names for better organization
+set $ws1 "1:term"
+set $ws2 "2:web"
+set $ws3 "3:code"
+set $ws4 "4:files"
+set $ws5 "5:chat"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
 
 ### Export env so portals/session services behave in Wayland
 exec_always dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway SWAYSOCK
@@ -62,27 +78,27 @@ bindsym $mod+space focus mode_toggle
 bindsym $mod+Shift+space floating toggle
 
 ### Workspaces
-bindsym $mod+1 workspace number 1
-bindsym $mod+2 workspace number 2
-bindsym $mod+3 workspace number 3
-bindsym $mod+4 workspace number 4
-bindsym $mod+5 workspace number 5
-bindsym $mod+6 workspace number 6
-bindsym $mod+7 workspace number 7
-bindsym $mod+8 workspace number 8
-bindsym $mod+9 workspace number 9
-bindsym $mod+0 workspace number 10
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
 
-bindsym $mod+Shift+1 move container to workspace number 1
-bindsym $mod+Shift+2 move container to workspace number 2
-bindsym $mod+Shift+3 move container to workspace number 3
-bindsym $mod+Shift+4 move container to workspace number 4
-bindsym $mod+Shift+5 move container to workspace number 5
-bindsym $mod+Shift+6 move container to workspace number 6
-bindsym $mod+Shift+7 move container to workspace number 7
-bindsym $mod+Shift+8 move container to workspace number 8
-bindsym $mod+Shift+9 move container to workspace number 9
-bindsym $mod+Shift+0 move container to workspace number 10
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
 
 # Prev/next workspace (deduped; arrows and hjkl both supported)
 bindsym $mod+Ctrl+Left  exec swaymsg workspace prev
@@ -101,8 +117,8 @@ bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
 ### Launchers
-# Core
-bindsym $mod+Return exec $term
+# Core applications
+bindsym $mod+Return exec $term || exec foot
 bindsym $mod+d exec $menu
 
 # File managers
@@ -176,7 +192,6 @@ bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
 bindsym --locked XF86MonBrightnessUp   exec brightnessctl set 5%+
 bindsym --locked F5 exec brightnessctl set 5%-
 bindsym --locked F6 exec brightnessctl set 5%+
-
 
 ### Idle + Lock
 exec --no-startup-id swayidle -w \

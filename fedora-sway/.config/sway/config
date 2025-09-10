@@ -19,14 +19,14 @@ set $menu $rofi_cmd -show combi -combi-modes drun#run -modes combi
 # Workspace names for better organization
 set $ws1 "1:term"
 set $ws2 "2:web"
-set $ws3 "3:code"
+set $ws3 "3"
 set $ws4 "4:files"
-set $ws5 "5:chat"
-set $ws6 "6"
-set $ws7 "7"
-set $ws8 "8"
+set $ws5 "5"
+set $ws6 "6:code"
+set $ws7 "7:notes"
+set $ws8 "8:chat"
 set $ws9 "9"
-set $ws10 "10"
+set $ws10 "10:spot"
 
 # Commented out for now (add as needed)
 #set $menu wofi --show drun
@@ -42,6 +42,12 @@ output * bg /usr/share/backgrounds/default.jxl fill
 # Dual monitor configuration
 output DP-1 resolution 3840x2160 position 0,0    scale 1
 output DP-2 resolution 3840x2160 position 3840,0 scale 1
+
+### Input Configuration
+input type:keyboard {
+    xkb_layout "us"
+    xkb_options "caps:super,compose:ralt"
+}
 
 ### Input Configuration
 # Example configuration (uncomment/modify as needed):

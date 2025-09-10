@@ -152,7 +152,7 @@ bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. 
 
 ### Tools & Utilities
 # Screenshots (Wayland-native for multi-monitor support)
-bindsym $mod+Shift+s exec grim -g "$(slurp)" - | swappy -f -
+bindsym $mod+Shift+s exec grim -g "$(slurp)" - | tee >(wl-copy) | swappy -f -
 bindsym Print exec grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
 
 ### Focus behavior

@@ -7,7 +7,7 @@ set $mod Mod4
 set $left h
 set $down j
 set $up k
-set $right lrr
+set $right l
 set $filebrowser thunar
 set $browser firefox
 
@@ -43,21 +43,34 @@ output * bg /usr/share/backgrounds/default.jxl fill
 output DP-1 resolution 3840x2160 position 0,0    scale 1
 output DP-2 resolution 3840x2160 position 3840,0 scale 1
 
+### Workspace Display Assignment
+# Workspaces 1-5 on left monitor (DP-1)
+workspace $ws1 output DP-1
+workspace $ws2 output DP-1
+workspace $ws3 output DP-1
+workspace $ws4 output DP-1
+workspace $ws5 output DP-1
+
+# Workspaces 6-10 on right monitor (DP-2)
+workspace $ws6 output DP-2
+workspace $ws7 output DP-2
+workspace $ws8 output DP-2
+workspace $ws9 output DP-2
+workspace $ws10 output DP-2
+
 ### Input Configuration
 input type:keyboard {
     xkb_layout "us"
     xkb_options "caps:super,compose:ralt"
 }
 
-### Input Configuration
-# Example configuration (uncomment/modify as needed):
+# Additional input devices (uncomment/modify as needed):
 # input "2:14:SynPS/2_Synaptics_TouchPad" {
 #     dwt enabled
 #     tap enabled
 #     natural_scroll enabled
 #     middle_emulation enabled
 # }
-# You can get the names of your inputs by running: swaymsg -t get_inputs
 
 ### Window Focus & Movement
 bindsym $mod+$left focus left
@@ -129,14 +142,32 @@ bindsym $mod+Return exec $term
 bindsym $mod+d exec $menu
 bindsym $mod+f exec $filebrowser
 
+# Editors / IDEs
+bindsym $mod+c exec codium
+bindsym $mod+x exec subl
+
 # Session controls
 bindsym $mod+Shift+r reload
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
 ### Tools & Utilities
-# Screenshots with Flameshot
-bindsym $mod+Shift+s exec flameshot gui
-bindsym Print exec flameshot full
+# Screenshots (Wayland-native for multi-monitor support)
+bindsym $mod+Shift+s exec grim -g "$(slurp)" - | swappy -f -
+bindsym Print exec grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
+
+### Focus behavior
+focus_follows_mouse no
+
+### Gaps
+gaps inner 10
+gaps outer 5
+smart_gaps on
+smart_borders on
+
+bindsym $mod+comma  gaps inner all minus 5
+bindsym $mod+period gaps inner all plus 5
+bindsym $mod+Shift+comma  gaps outer all minus 5
+bindsym $mod+Shift+period gaps outer all plus 5
 
 ### Media & Hardware Keys
 

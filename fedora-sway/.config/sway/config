@@ -37,7 +37,7 @@ set $ws10 "10:spot"
 ### Output Configuration
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
 # Requires: desktop-backgrounds-compat, swaybg, jxl-pixbuf-loader
-output * bg /usr/share/backgrounds/default.jxl fill
+output * bg ~/wallpapers/walls05.png fill
 
 # Dual monitor configuration
 output DP-1 resolution 3840x2160 position 0,0    scale 1

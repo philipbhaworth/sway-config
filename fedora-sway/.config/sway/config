@@ -40,8 +40,12 @@ set $ws10 "10:spot"
 output * bg ~/wallpapers/walls09.png fill
 
 # Dual monitor configuration
-output DP-1 resolution 3840x2160 position 0,0    scale 1
-output DP-2 resolution 3840x2160 position 3840,0 scale 1
+# LG HDR 4K on the left
+output DP-1 resolution 3840x2160 position 0,0 scale 1
+
+# Acer KG272K on the right, rotated vertically
+output DP-2 resolution 3840x2160 transform 90 position 3840,0 scale 1
+
 
 ### Workspace Display Assignment
 # Workspaces 1-5 on left monitor (DP-1)

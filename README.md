@@ -42,7 +42,7 @@ chmod +x debian_install.sh
 
 ```bash
 cd ~
-git clone <your-repo-url> sway-config
+https://github.com/philipbhaworth/sway-config.git
 cd sway-config
 ```
 

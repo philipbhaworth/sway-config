@@ -30,7 +30,7 @@ sudo apt install -y \
     udisks2 \
     thunar-volman \
     tumbler \
-    swaync
+    sway-notification-center
 
 echo "=== Installing Audio/Media Control ==="
 sudo apt install -y \

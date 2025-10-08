@@ -5,341 +5,463 @@
 ## 1. Base System
 
 During the Debian installer:
-
 - Select **SSH server**
 - Select **standard system utilities**
 - Do **not** select a desktop environment
 
 ---
 
-## 2. Core Tools
+# Sway Configuration for Debian 13 Trixie
+
+A minimal, utilitarian Sway desktop environment with Waybar, managed using GNU Stow.
+
+## Features
+
+- **Sway** - Tiling Wayland compositor
+- **Waybar** - Minimal, clean status bar with idle inhibitor
+- **Wofi** - Wayland-native application launcher (Everforest theme)
+- **SwayNC** - Notification daemon with control center
+- **Kitty** - GPU-accelerated terminal
+- **Dual 4K monitor support** - Pre-configured for DP-1 (horizontal) + DP-2 (vertical)
+
+---
+
+## Quick Start
+
+### 1. Fresh Debian 13 Trixie Minimal Install
+
+Run the automated installation script:
 
 ```bash
-sudo apt update && sudo apt install -y \
-  build-essential git curl wget unzip p7zip-full \
-  htop vim tmux stow tree jq fzf ripgrep bat fd-find \
-  firefox-esr
+cd ~/sway-config/sway-scripts
+chmod +x debian_install.sh
+./debian_install.sh
+```
+
+### 2. Clone This Repository
+
+```bash
+cd ~
+git clone <your-repo-url> sway-config
+cd sway-config
+```
+
+### 3. Deploy Configurations with Stow
+
+```bash
+cd ~/sway-config
+
+# Deploy Sway config
+stow debian13-sway
+
+# Deploy Waybar
+stow waybar
+
+# Deploy SwayNC
+stow swaync
+
+# Deploy Wofi
+stow wofi
+
+# Optional: Deploy shell config
+stow bash
+# OR
+stow zsh-linux
+```
+
+### 4. Setup Wallpapers
+
+```bash
+mkdir -p ~/wallpapers
+cp /path/to/your/wallpaper.png ~/wallpapers/walls09.png
+```
+
+### 5. Make Scripts Executable
+
+```bash
+chmod +x ~/sway-config/sway-scripts/*.sh
+```
+
+### 6. Start Sway
+
+```bash
+# From TTY (Ctrl+Alt+F2)
+sway
+
+# Or use a display manager (see Display Manager section)
 ```
 
 ---
 
-## 3. Sway & Wayland Core
+## Package Installation Details
 
-```bash
-sudo apt install -y \
-  sway swaylock swayidle swaybg waybar wl-clipboard xwayland grim slurp
-```
+The `debian_install.sh` script installs:
 
----
+### Core Sway Environment
+- sway, swaybg, swayidle, swaylock
+- waybar, xwayland
+- wl-clipboard, grim, slurp, swappy
 
-## 4. Portals for Flatpak, Pickers, Sharing
+### Tools & Applications
+- wofi (launcher)
+- kitty (terminal)
+- thunar (file manager) + gvfs, udisks2, thunar-volman, tumbler
+- swaync (notifications)
 
-```bash
-sudo apt install -y \
-  xdg-desktop-portal xdg-desktop-portal-wlr
-```
+### Audio & Media
+- pipewire, pipewire-pulse, wireplumber
+- pavucontrol, playerctl, pamixer
 
----
+### System Utilities
+- brightnessctl (backlight control)
+- power-profiles-daemon
 
-## 5. Terminals & Editor
+### Fonts
+- fonts-font-awesome (Waybar icons)
+- fonts-noto, fonts-noto-mono
 
-```bash
-sudo apt install -y \
-  foot kitty pluma
-```
-
----
-
-## 6. Files & Storage
-
-```bash
-sudo apt install -y \
-  thunar thunar-volman thunar-archive-plugin \
-  tumbler ffmpegthumbnailer \
-  gvfs gvfs-backends gvfs-fuse \
-  udisks2 file-roller udiskie \
-  gnome-disk-utility
-```
+### Development
+- stow (dotfile management)
+- git
 
 ---
 
-## 7. Fonts & Theming
+## Additional Software Installation
+
+### Code Editors
+
+#### VSCodium (Open Source VS Code)
 
 ```bash
-sudo apt install -y \
-  fonts-dejavu fonts-noto fonts-noto-color-emoji \
-  fonts-font-awesome nwg-look
+# Add repository
+wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+    | gpg --dearmor \
+    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
+
+echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
+    | sudo tee /etc/apt/sources.list.d/vscodium.list
+
+# Install
+sudo apt update && sudo apt install codium
 ```
 
----
-
-## 8. Audio & Notifications
+#### Sublime Text
 
 ```bash
-sudo apt install -y \
-  pipewire pipewire-audio wireplumber libspa-0.2-bluetooth \
-  alsa-utils sway-notification-center pavucontrol libnotify-bin
+# Add repository
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg \
+    | gpg --dearmor \
+    | sudo dd of=/usr/share/keyrings/sublimehq-archive.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/sublimehq-archive.gpg] https://download.sublimetext.com/ apt/stable/" \
+    | sudo tee /etc/apt/sources.list.d/sublime-text.list
+
+# Install
+sudo apt update && sudo apt install sublime-text
 ```
 
----
-
-## 9. Bluetooth
+### Flatpak Setup
 
 ```bash
-sudo apt install -y \
-  bluez blueman
+# Install Flatpak
+sudo apt install flatpak
+
+# Add Flathub repository
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+# Reboot or re-login for PATH updates
 ```
 
----
-
-## 10. Network
+#### Flatpak Applications
 
 ```bash
-sudo apt install -y \
-  network-manager
-```
+# Vesktop (Discord client)
+flatpak install flathub dev.vencord.Vesktop
 
----
+# Signal
+flatpak install flathub org.signal.Signal
 
-## 11. PolicyKit Agent
+# Zen Browser
+flatpak install flathub io.github.zen_browser.zen
 
-```bash
-sudo apt install -y \
-  lxqt-policykit
-```
+# Obsidian
+flatpak install flathub md.obsidian.Obsidian
 
----
-
-## 12. Media Tools
-
-```bash
-sudo apt install -y \
-  qimgv mpv
-```
-
----
-
-## 13. Launchers & Utilities
-
-```bash
-sudo apt install -y \
-  wofi wlogout swappy cliphist
-```
-
----
-
-## 14. Power & Display
-
-```bash
-sudo apt install -y \
-  brightnessctl gammastep
-```
-
----
-
-## 15. Flatpak
-
-```bash
-sudo apt install -y flatpak
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-```
-
----
-
-## 16. Post-install Setup
-
-### Aliases for Debian naming
-
-```bash
-echo "alias bat='batcat'" >> ~/.bashrc
-echo "alias fd='fdfind'" >> ~/.bashrc
+# Spotify
+flatpak install flathub com.spotify.Client
 ```
 
 ### Starting Sway
 
-**Option A: Auto-start from TTY (no display manager)**
+This setup uses TTY login (no display manager):
 
 ```bash
-echo 'if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = "1" ]; then
+# Login to TTY (Ctrl+Alt+F2 if in graphical environment)
+# After login, start Sway:
+sway
+```
+
+**Optional: Auto-start Sway on login**
+
+Add to your `~/.bashrc` or `~/.zshrc`:
+
+```bash
+# Auto-start Sway on TTY1
+if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
   exec sway
-fi' >> ~/.bash_profile
+fi
 ```
 
-**Option B: With greetd + tuigreet**
+### Additional Development Tools
 
 ```bash
-sudo apt install -y greetd tuigreet
-sudo systemctl enable --now greetd
-# Edit /etc/greetd/config.toml to run: exec "sway"
+# Essential CLI tools
+sudo apt install vim curl wget tmux net-tools tree
+
+# Build essentials
+sudo apt install build-essential
+
+# Python development
+sudo apt install python3-pip python3-venv
+
+# Container tools (Docker alternative)
+sudo apt install podman podman-compose
 ```
-
-### Sway config essentials
-
-Create or extend `~/.config/sway/config`:
-
-```conf
-# Background
-exec_always --no-startup-id swaybg -i /usr/share/backgrounds/gnome/adwaita-day.png -m fill
-
-# Idle + lock
-exec --no-startup-id swayidle -w \
-  timeout 300 'swaylock -f -c 000000' \
-  timeout 600 'swaymsg "output * power off"' \
-  resume 'swaymsg "output * power on"' \
-  before-sleep 'swaylock -f -c 000000'
-
-# Notifications
-exec --no-startup-id swaync
-
-# Network applet
-exec --no-startup-id nm-applet --indicator
-
-# Bluetooth applet
-exec --no-startup-id blueman-applet
-
-# Automount USB devices
-exec --no-startup-id udiskie -t
-
-# Status bar
-exec --no-startup-id waybar
-```
-
-### Daily Workflow
-
-- **System updates:**
-  ```bash
-  sudo apt update && sudo apt full-upgrade -y
-  ```
-
-- **Flatpak updates:**
-  ```bash
-  flatpak update -y
-  ```
-
-- **Service management:**
-  ```bash
-  # Check statuses
-  systemctl --user status pipewire wireplumber
-  systemctl status NetworkManager
-  systemctl status bluetooth
-
-  # Restart if needed
-  systemctl --user restart pipewire
-  sudo systemctl restart NetworkManager
-  sudo systemctl restart bluetooth
-  ```
-
-- **Power management & brightness:**
-  ```bash
-  # Lower brightness to 50%
-  brightnessctl set 50%
-
-  # Night light (e.g., 4500K)
-  gammastep -O 4500
-  ```
 
 ---
 
-# Package Inventory (with one-line explanations)
+## Configuration Structure
 
-### Base
-- **build-essential** – Compiler and build tools (gcc, g++, make).  
-- **git** – Distributed version control system.  
-- **curl** – Transfers data via URLs.  
-- **wget** – Downloads files from the web.  
-- **unzip** – Extract `.zip` archives.  
-- **p7zip-full** – Tools for `.7z` and other archive formats.  
-- **htop** – Interactive process monitor.  
-- **vim** – Text editor.  
-- **tmux** – Terminal multiplexer.  
-- **stow** – Symlink manager (useful for dotfiles).  
-- **tree** – Directory tree viewer.  
-- **jq** – JSON processor.  
-- **fzf** – Fuzzy finder for the command line.  
-- **ripgrep (rg)** – Fast text search across files.  
-- **bat** – `cat` alternative with syntax highlighting (`batcat` binary).  
-- **fd-find** – Fast file search (`fdfind` binary).  
-- **firefox-esr** – Web browser (for GitHub and general browsing).  
+```
+~/sway-config/
+├── debian13-sway/        # Debian-specific Sway config
+│   └── .config/sway/config
+├── waybar/               # Status bar config
+│   └── .config/waybar/
+│       ├── config
+│       └── style.css
+├── swaync/              # Notification daemon
+│   └── .config/swaync/
+│       ├── config.json
+│       └── style.css
+├── wofi/                # Application launcher
+│   └── .config/wofi/
+│       ├── config
+│       └── style.css
+├── bash/                # Bash shell config
+│   └── .bashrc
+├── zsh-linux/           # Zsh shell config
+│   └── .zshrc
+└── sway-scripts/        # Utility scripts
+    ├── debian_install.sh
+    ├── power-menu.sh
+    └── package_checker.sh
+```
 
-### Sway & Wayland
-- **sway** – Wayland tiling window manager.  
-- **swaylock** – Screen locker.  
-- **swayidle** – Idle timeout manager.  
-- **swaybg** – Wallpaper setter.  
-- **waybar** – Status bar for Wayland.  
-- **wl-clipboard** – Wayland clipboard utilities (`wl-copy`, `wl-paste`).  
-- **xwayland** – Run X11 apps under Wayland.  
-- **grim** – Screenshot tool.  
-- **slurp** – Region selector (for screenshots/screen recording).  
+---
 
-### Portals
-- **xdg-desktop-portal** – Portal service for sandboxed apps.  
-- **xdg-desktop-portal-wlr** – Wayland portal backend for Sway.  
+## Key Bindings
 
-### Terminals & Editor
-- **foot** – Lightweight Wayland terminal.  
-- **kitty** – GPU-accelerated terminal emulator.  
-- **pluma** – MATE’s simple text editor.  
+### Window Management
+- `Super + h/j/k/l` - Focus window (vim-style)
+- `Super + Shift + h/j/k/l` - Move window
+- `Super + 1-0` - Switch workspace
+- `Super + Shift + 1-0` - Move window to workspace
+- `Super + q` - Close window
+- `Super + Shift + f` - Fullscreen
 
-### Files & Storage
-- **thunar** – Lightweight file manager.  
-- **thunar-volman** – Automount support in Thunar.  
-- **thunar-archive-plugin** – Archive integration.  
-- **tumbler** – Thumbnail generation service.  
-- **ffmpegthumbnailer** – Thumbnails for video files.  
-- **gvfs, gvfs-backends, gvfs-fuse** – Virtual filesystem & mounting support.  
-- **udisks2** – Disk management service (needed for automount).  
-- **file-roller** – GUI archive manager.  
-- **udiskie** – Automount tool for removable media.  
-- **gnome-disk-utility** – Disk/partition management GUI.  
+### Applications
+- `Super + Return` - Terminal (Kitty)
+- `Super + d` - Application launcher (Wofi)
+- `Super + f` - File manager (Thunar)
+- `Super + c` - VSCodium
+- `Super + x` - Sublime Text
 
-### Fonts & Theming
-- **fonts-dejavu** – Common sans/serif/mono font family.  
-- **fonts-noto** – Comprehensive Unicode font family.  
-- **fonts-noto-color-emoji** – Color emoji support.  
-- **fonts-font-awesome** – Icon font for status bars/GTK themes.  
-- **nwg-look** – GTK theme switcher for Wayland.  
+### Layout
+- `Super + b` - Split horizontal
+- `Super + v` - Split vertical
+- `Super + s` - Stacking layout
+- `Super + w` - Tabbed layout
+- `Super + e` - Toggle split layout
 
-### Audio & Notifications
-- **pipewire** – Modern audio/video server.  
-- **pipewire-audio** – PipeWire audio support.  
-- **wireplumber** – PipeWire session manager.  
-- **libspa-0.2-bluetooth** – Bluetooth audio support.  
-- **alsa-utils** – ALSA mixer and sound tools.  
-- **sway-notification-center (swaync)** – Wayland notification daemon.  
-- **pavucontrol** – GTK volume control/mixer.  
-- **libnotify-bin** – Command-line tool `notify-send` for desktop notifications.  
+### System
+- `Super + Shift + r` - Reload Sway config
+- `Super + Shift + e` - Exit Sway
+- `Print` - Screenshot (full screen)
+- `Super + Shift + s` - Screenshot (region selector)
 
-### Bluetooth
-- **bluez** – Linux Bluetooth stack.  
-- **blueman** – Bluetooth manager UI.  
+### Media Keys
+- `XF86AudioRaiseVolume` - Volume up
+- `XF86AudioLowerVolume` - Volume down
+- `XF86AudioMute` - Mute toggle
+- `XF86MonBrightnessUp/Down` - Brightness control
+- `XF86AudioPlay/Pause/Next/Prev` - Media controls
 
-### Network
-- **network-manager** – Network connection manager.  
+---
 
-### Media
-- **qimgv** – Lightweight image viewer.  
-- **mpv** – Media player.  
+## Monitor Configuration
 
-### Launchers & Utilities
-- **wofi** – Wayland application launcher (used for Mod+D).  
-- **wlogout** – Logout/power menu for Wayland.  
-- **swappy** – Wayland screenshot editor.  
-- **cliphist** – Clipboard manager for wl-clipboard.  
+Current setup for dual 4K monitors:
 
-### Power & Display
-- **brightnessctl** – Control screen backlight brightness.  
-- **gammastep** – Night-light style color temperature adjustment.  
+```bash
+# LG HDR 4K (left, horizontal)
+output DP-1 resolution 3840x2160 position 0,0 scale 1
 
-### Flatpak
-- **flatpak** – Universal package manager for sandboxed apps.  
-- **flathub remote** – Popular Flatpak repository with desktop apps.  
-- **flathub apps**
-  - Eyedropper
-  - Vesktop
-  - Obsidian
-  - Signal Desktop   
+# Acer KG272K (right, vertical)
+output DP-2 resolution 3840x2160 transform 90 position 3840,0 scale 1
+```
 
-### Apps Installed
-- **VS Codium** - https://vscodium.com/
-- 
+To adjust for your setup:
+
+1. List available outputs:
+   ```bash
+   swaymsg -t get_outputs
+   ```
+
+2. Edit `~/.config/sway/config` and modify output configuration
+
+3. Reload Sway: `Super + Shift + r`
+
+---
+
+## Troubleshooting
+
+### Waybar Icons Missing
+
+```bash
+sudo apt install fonts-font-awesome
+fc-cache -fv
+swaymsg reload
+```
+
+### SwayNC Not Starting
+
+```bash
+pkill swaync
+swaync &
+```
+
+### Stow Conflicts
+
+If stow reports conflicts with existing files:
+
+```bash
+# Backup existing configs
+mkdir ~/config-backup
+mv ~/.config/sway ~/config-backup/
+mv ~/.config/waybar ~/config-backup/
+
+# Then re-run stow
+cd ~/sway-config
+stow debian13-sway waybar swaync wofi
+```
+
+### Check Deployed Symlinks
+
+```bash
+cd ~/sway-config
+stow -n -v debian13-sway  # Dry run - shows what would be linked
+```
+
+### Remove Deployed Configs
+
+```bash
+cd ~/sway-config
+stow -D debian13-sway  # Removes symlinks
+```
+
+### Audio Not Working
+
+```bash
+# Check PipeWire status
+systemctl --user status pipewire pipewire-pulse wireplumber
+
+# Restart PipeWire
+systemctl --user restart pipewire pipewire-pulse wireplumber
+```
+
+### Brightness Control Not Working
+
+```bash
+# Add user to video group
+sudo usermod -aG video $USER
+
+# Re-login for changes to take effect
+```
+
+---
+
+## Customization
+
+### Change Wallpaper
+
+Place your wallpaper in `~/wallpapers/` and edit `~/.config/sway/config`:
+
+```bash
+output * bg ~/wallpapers/your-wallpaper.png fill
+```
+
+### Modify Waybar Appearance
+
+Edit `~/.config/waybar/style.css` for colors and styling.
+
+Edit `~/.config/waybar/config` for modules and layout.
+
+### Wofi Theme
+
+The Everforest theme is in `~/.config/wofi/style.css`.
+
+Color scheme:
+- Background: `#38423d`
+- Accent: `#a7c080`
+- Text: `#d3c6aa`
+
+### Gaps and Borders
+
+Edit `~/.config/sway/config`:
+
+```bash
+gaps inner 10      # Space between windows
+gaps outer 5       # Space from screen edge
+smart_gaps on      # Disable gaps when single window
+smart_borders on   # Disable borders when single window
+```
+
+---
+
+## System Information
+
+**Tested on:**
+- Debian 13 (Trixie)
+- Kernel: 6.x
+- Sway: Latest available in Debian repos
+
+**Hardware:**
+- Dual 4K monitors (DP-1 + DP-2)
+- Keyboard with media keys
+- Backlight control support
+
+---
+
+## Contributing
+
+Feel free to fork and customize for your own setup. Pull requests welcome for:
+- Bug fixes
+- Debian-specific improvements
+- Additional utility scripts
+- Documentation improvements
+
+---
+
+## License
+
+MIT License - See LICENSE file for details
+
+---
+
+## Acknowledgments
+
+- Sway developers
+- Waybar project
+- Everforest color scheme
+- Debian community

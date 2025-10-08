@@ -1,51 +1,58 @@
-# Custom Sway configuration (Laptop)
-# Updated for Debian 13 + Sway + Wayland helpers
-# Reference: man 5 sway
+# Custom Sway configuration (Debian 13 Trixie)
+# Copy this to ~/.config/sway/config
+# Read `man 5 sway` for a complete reference.
 
 ### Variables
 set $mod Mod4
 set $left h
 set $down j
-set $up   k
+set $up k
 set $right l
-set $term kitty
 set $filebrowser thunar
-set $menu wofi --show drun
 set $browser firefox
-set $chat vesktop
 
-# Path management
-set $scripts ~/.config/sway/scripts
-set $wallpapers ~/.config/sway/wallpapers
-set $power-menu $scripts/wofi-power.sh
-set $wall $wallpapers/walls_02.png
+# Terminal and menu configuration
+set $term kitty
+set $rofi_cmd rofi -terminal '$term'
+set $menu $rofi_cmd -show combi -combi-modes drun#run -modes combi
 
 # Workspace names for better organization
 set $ws1 "1:term"
 set $ws2 "2:web"
-set $ws3 "3:code"
+set $ws3 "3"
 set $ws4 "4:files"
-set $ws5 "5:chat"
-set $ws6 "6"
-set $ws7 "7"
-set $ws8 "8"
+set $ws5 "5"
+set $ws6 "6:code"
+set $ws7 "7:notes"
+set $ws8 "8:chat"
 set $ws9 "9"
-set $ws10 "10"
-
-### Export env so portals/session services behave in Wayland
-exec_always dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway SWAYSOCK
-exec_always systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK
+set $ws10 "10:spot"
 
 ### Output Configuration
-# Wallpaper; Sway will spawn swaybg for this
-output * bg $wall fill
+# Default wallpaper
+output * bg ~/wallpapers/walls09.png fill
 
-# Laptop display example (uncomment/tune if needed)
-# output eDP-1 scale 1.25
+# Dual monitor configuration
+# LG HDR 4K on the left
+output DP-1 resolution 3840x2160 position 0,0 scale 1
 
-# Docked dual-monitor examples (commented)
-# output DP-1 resolution 3840x2160 position 0,0    scale 1
-# output DP-2 resolution 3840x2160 position 3840,0 scale 1
+# Acer KG272K on the right, rotated vertically
+output DP-2 resolution 3840x2160 transform 90 position 3840,0 scale 1
+
+### Workspace Display Assignment
+# Workspaces 1-5 on left monitor (DP-1)
+workspace $ws1 output DP-1
+workspace $ws2 output DP-1
+workspace $ws3 output DP-1
+workspace $ws4 output DP-1
+workspace $ws5 output DP-1
+
+# Workspaces 6-10 on right monitor (DP-2)
+workspace $ws6 output DP-2
+workspace $ws7 output DP-2
+workspace $ws8 output DP-2
+workspace $ws9 output DP-2
+workspace $ws10 output DP-2
 
 ### Input Configuration
 input type:keyboard {
@@ -54,28 +61,29 @@ input type:keyboard {
 }
 
 ### Window Focus & Movement
-bindsym $mod+$left  focus left
-bindsym $mod+$down  focus down
-bindsym $mod+$up    focus up
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
 bindsym $mod+$right focus right
-bindsym $mod+Left   focus left
-bindsym $mod+Down   focus down
-bindsym $mod+Up     focus up
-bindsym $mod+Right  focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
 
-bindsym $mod+Shift+$left  move left
-bindsym $mod+Shift+$down  move down
-bindsym $mod+Shift+$up    move up
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
 bindsym $mod+Shift+$right move right
-bindsym $mod+Shift+Left   move left
-bindsym $mod+Shift+Down   move down
-bindsym $mod+Shift+Up     move up
-bindsym $mod+Shift+Right  move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
 
 bindsym $mod+q kill
-bindsym $mod+f fullscreen
+bindsym $mod+Shift+f fullscreen
 bindsym $mod+space focus mode_toggle
 bindsym $mod+Shift+space floating toggle
+bindsym $mod+a focus parent
 
 ### Workspaces
 bindsym $mod+1 workspace $ws1
@@ -100,7 +108,7 @@ bindsym $mod+Shift+8 move container to workspace $ws8
 bindsym $mod+Shift+9 move container to workspace $ws9
 bindsym $mod+Shift+0 move container to workspace $ws10
 
-# Prev/next workspace (deduped; arrows and hjkl both supported)
+# Prev/next workspace
 bindsym $mod+Ctrl+Left  exec swaymsg workspace prev
 bindsym $mod+Ctrl+Right exec swaymsg workspace next
 bindsym $mod+Ctrl+$left  exec swaymsg workspace prev
@@ -118,37 +126,22 @@ bindsym $mod+minus scratchpad show
 
 ### Launchers
 # Core applications
-bindsym $mod+Return exec $term || exec foot
+bindsym $mod+Return exec $term
 bindsym $mod+d exec $menu
-
-# File managers
-bindsym $mod+n exec $filebrowser
-bindsym $mod+t exec thunar
-
-# Browsers / comms
-bindsym $mod+Shift+b exec $browser
-bindsym $mod+g exec google-chrome-stable
-bindsym $mod+Shift+d [app_id="vesktop"] focus; exec vesktop
+bindsym $mod+f exec $filebrowser
 
 # Editors / IDEs
 bindsym $mod+c exec codium
 bindsym $mod+x exec subl
-bindsym $mod+Shift+t exec flatpak run org.gnome.TextEditor
-bindsym $mod+p exec pluma
-
-# Other apps
-bindsym $mod+o exec flatpak run md.obsidian.Obsidian
 
 # Session controls
 bindsym $mod+Shift+r reload
-bindsym $mod+Shift+q exec swaynag -t warning -m 'Do you really want to exit sway?' -B 'Yes' 'swaymsg exit'
+bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
 ### Tools & Utilities
-bindsym $mod+Shift+s exec grim -g "$(slurp)" - | swappy -f -
-bindsym Print exec grim
-bindsym $mod+Shift+p exec hyprpicker -a && notify-send "Color picked" "$(wl-paste)"
-bindsym $mod+Shift+v exec bash -lc "cliphist list | wofi --dmenu | cliphist decode | wl-copy"
-bindsym $mod+Shift+x exec $power-menu
+# Screenshots (Wayland-native for multi-monitor support)
+bindsym $mod+Shift+s exec grim -g "$(slurp)" - | tee >(wl-copy) | swappy -f -
+bindsym Print exec grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
 
 ### Focus behavior
 focus_follows_mouse no
@@ -164,64 +157,72 @@ bindsym $mod+period gaps inner all plus 5
 bindsym $mod+Shift+comma  gaps outer all minus 5
 bindsym $mod+Shift+period gaps outer all plus 5
 
-### Window appearance (Everforest-ish)
-default_border pixel 2
-default_floating_border pixel 2
-hide_edge_borders smart
+### Media & Hardware Keys
 
-client.focused          #d3c6aa #2b3339 #d3c6aa #d3c6aa #d3c6aa
-client.focused_inactive #3c474d #323c41 #d3c6aa #3c474d #3c474d
-client.unfocused        #2b3339 #2b3339 #d3c6aa #2b3339 #2b3339
-client.urgent           #e67e80 #e67e80 #2b3339 #e67e80 #e67e80
+# Volume controls (Debian-compatible using pamixer)
+bindsym --locked XF86AudioRaiseVolume exec pamixer -i 5
+bindsym --locked XF86AudioLowerVolume exec pamixer -d 5
+bindsym --locked XF86AudioMute exec pamixer -t
+bindsym --locked XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
-### Media & Hardware keys (PipeWire via wpctl)
+# Brightness controls
+set $brightness_notification_cmd command -v notify-send >/dev/null && \
+    VALUE=$(brightnessctl --percentage get) && \
+    notify-send -e -h string:x-canonical-private-synchronous:brightness \
+        -h "int:value:$VALUE" -t 800 "Brightness: ${VALUE}%"
+bindsym XF86MonBrightnessDown exec 'STEP="$brightness_step" && brightnessctl -q set ${STEP:-5}%- && $brightness_notification_cmd'
+bindsym XF86MonBrightnessUp exec 'STEP="$brightness_step" && brightnessctl -q set +${STEP:-5}% && $brightness_notification_cmd'
 
-# Audio
-bindsym --locked XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
-bindsym --locked XF86AudioLowerVolume exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%-
-bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+
-bindsym --locked XF86AudioMicMute     exec wpctl set-mute   @DEFAULT_AUDIO_SOURCE@ toggle
+# Media player controls
+bindsym --locked XF86AudioPlay exec playerctl play-pause
+bindsym --locked XF86AudioStop exec playerctl stop
+bindsym XF86AudioForward exec playerctl position +10
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPause exec playerctl pause
+bindsym XF86AudioPrev exec playerctl previous
+bindsym XF86AudioRewind exec playerctl position -10
 
-# F-key fallbacks (when FnLock is off and keys emit F2/F3/F4)
-bindsym --locked F2 exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%-
-bindsym --locked F3 exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+
-bindsym --locked F4 exec wpctl set-mute   @DEFAULT_AUDIO_SOURCE@ toggle
+### Mouse Controls
+floating_modifier $mod normal
 
-# Brightness
-bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
-bindsym --locked XF86MonBrightnessUp   exec brightnessctl set 5%+
-bindsym --locked F5 exec brightnessctl set 5%-
-bindsym --locked F6 exec brightnessctl set 5%+
+### Resize Mode
+mode "resize" {
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
 
-### Idle + Lock
-exec --no-startup-id swayidle -w \
-  timeout 300 'swaylock -f -c 000000' \
-  timeout 600 'swaymsg "output * power off"' \
-  resume 'swaymsg "output * power on"' \
-  before-sleep 'swaylock -f -c 000000'
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
 
 ### Bar (Waybar)
 bar {
     swaybar_command waybar
 }
 
-### Autostart
-# Clipboard history
-exec_always wl-paste -t text  --watch cliphist store
-exec_always wl-paste -t image --watch cliphist store
+### Idle & Lock Configuration
+exec LT="$lock_timeout" ST="$screen_timeout" LT=${LT:-300} ST=${ST:-60} && \
+    swayidle -w \
+        timeout $LT 'swaylock -f' \
+        timeout $((LT + ST)) 'swaymsg "output * power off"' \
+                      resume 'swaymsg "output * power on"'  \
+        timeout $ST 'pgrep -xu "$USER" swaylock >/dev/null && swaymsg "output * power off"' \
+             resume 'pgrep -xu "$USER" swaylock >/dev/null && swaymsg "output * power on"'  \
+        before-sleep 'swaylock -f' \
+        lock 'swaylock -f' \
+        unlock 'pkill -xu "$USER" -SIGUSR1 swaylock'
 
+### Autostart
 # Notifications
 exec_always swaync
 
-# Network & Bluetooth applets
-exec --no-startup-id nm-applet --indicator
-exec --no-startup-id blueman-applet
-
-# Automount removable media
-exec --no-startup-id udiskie -t
-
-# NOTE: Do not manually spawn xdg-desktop-portal*; let systemd/dbus manage them.
-
-### Include system defaults (after ours so ours can override via later 'include' if desired)
-include /etc/sway/config-vars.d/*
+### Include system defaults (Debian-compatible)
 include /etc/sway/config.d/*
+include ~/.config/sway/config.d/*

@@ -12,9 +12,9 @@ set $filebrowser thunar
 set $browser firefox
 
 # Terminal and menu configuration
+# Terminal and menu configuration
 set $term kitty
-set $rofi_cmd rofi -terminal '$term'
-set $menu $rofi_cmd -show combi -combi-modes drun#run -modes combi
+set $menu wofi --show drun
 
 # Workspace names for better organization
 set $ws1 "1:term"
@@ -30,14 +30,14 @@ set $ws10 "10:spot"
 
 ### Output Configuration
 # Default wallpaper
-output * bg ~/wallpapers/walls09.png fill
+output * bg ~/wallpapers/wall36.jpg fill
 
 # Dual monitor configuration
 # LG HDR 4K on the left
 output DP-1 resolution 3840x2160 position 0,0 scale 1
 
 # Acer KG272K on the right, rotated vertically
-output DP-2 resolution 3840x2160 transform 90 position 3840,0 scale 1
+output DP-2 resolution 3840x2160 transform 90 position 3840,0 scale 1.25
 
 ### Workspace Display Assignment
 # Workspaces 1-5 on left monitor (DP-1)
@@ -129,10 +129,12 @@ bindsym $mod+minus scratchpad show
 bindsym $mod+Return exec $term
 bindsym $mod+d exec $menu
 bindsym $mod+f exec $filebrowser
+bindsym $mod+shift+b exec $browser
 
 # Editors / IDEs
 bindsym $mod+c exec codium
 bindsym $mod+x exec subl
+bindsym $mod+z exec zed
 
 # Session controls
 bindsym $mod+Shift+r reload

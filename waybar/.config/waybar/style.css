@@ -1,22 +1,26 @@
+/* ========== Global Styles ========== */
 * {
-    font-family: 'Noto Sans Mono', 'Font Awesome 6 Free', 'Font Awesome 6 Brands', monospace;
-    font-size: 16px; /* Increased for 4K readability */
+    font-family:
+        "JetBrainsMono Nerd Font", "JetBrains Mono", "Font Awesome 6 Free",
+        "Font Awesome 6 Brands", monospace;
+    font-size: 16px;
     font-weight: normal;
 }
 
+/* ========== Window ========== */
 window#waybar {
     background-color: rgba(43, 48, 59, 0.95);
     border-bottom: 2px solid rgba(100, 114, 125, 0.8);
     color: #ffffff;
     transition-property: background-color;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
 }
 
 window#waybar.hidden {
     opacity: 0.2;
 }
 
-/* Remove all button styling */
+/* ========== Buttons ========== */
 button {
     box-shadow: none;
     border: none;
@@ -27,15 +31,18 @@ button {
 
 button:hover {
     background: rgba(255, 255, 255, 0.1);
-    box-shadow: none;
 }
 
-/* Workspace styling - minimal with focus indicator */
+/* ========== Workspaces ========== */
+#workspaces {
+    margin: 0;
+}
+
 #workspaces button {
     padding: 4px 12px;
+    margin: 0 2px;
     background-color: transparent;
     color: #ffffff;
-    margin: 0 2px;
     border-radius: 3px;
 }
 
@@ -53,7 +60,7 @@ button:hover {
     color: #ffffff;
 }
 
-/* All modules - consistent minimal styling */
+/* ========== All Modules - Base Styling ========== */
 #clock,
 #battery,
 #cpu,
@@ -65,28 +72,35 @@ button:hover {
 #mode,
 #idle_inhibitor,
 #scratchpad,
-#power-profiles-daemon,
 #window,
 #language,
 #custom-power {
     padding: 4px 12px;
-    color: #ffffff;
-    background-color: transparent;
     margin: 0 2px;
+    background-color: transparent;
+    color: #ffffff;
     border-radius: 3px;
 }
 
-/* Window title styling */
+/* ========== Specific Modules ========== */
 #window {
-    background-color: transparent;
-    border: none;
+    margin: 0;
     font-style: italic;
 }
 
-/* Critical/warning states only */
+#mode {
+    background-color: #e74c3c;
+    font-weight: bold;
+}
+
+#scratchpad.empty {
+    opacity: 0.5;
+}
+
+/* ========== Module States ========== */
+/* Battery */
 #battery.critical:not(.charging) {
     background-color: #e74c3c;
-    color: #ffffff;
     animation: blink 1s steps(2) infinite;
 }
 
@@ -97,43 +111,26 @@ button:hover {
 
 #battery.charging {
     background-color: #27ae60;
-    color: #ffffff;
 }
 
+/* Network */
 #network.disconnected {
     background-color: #e74c3c;
-    color: #ffffff;
 }
 
+/* Audio */
 #pulseaudio.muted {
     background-color: #95a5a6;
     color: #2c3e50;
 }
 
+/* Idle Inhibitor */
 #idle_inhibitor.activated {
     background-color: #f39c12;
     color: #000000;
 }
 
-/* Remove margins for cleaner layout */
-#window,
-#workspaces {
-    margin: 0;
-}
-
-.modules-left > widget:first-child > #workspaces {
-    margin-left: 4px;
-}
-
-.modules-right > widget:last-child {
-    margin-right: 4px;
-}
-
-/* Tray icons */
-#tray {
-    background-color: transparent;
-}
-
+/* ========== System Tray ========== */
 #tray > .passive {
     -gtk-icon-effect: dim;
 }
@@ -144,15 +141,11 @@ button:hover {
     border-radius: 3px;
 }
 
-/* Scratchpad indicator */
-#scratchpad.empty {
-    background-color: transparent;
-    opacity: 0.5;
+/* ========== Layout Adjustments ========== */
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 4px;
 }
 
-/* Mode indicator (resize, etc.) */
-#mode {
-    background-color: #e74c3c;
-    color: #ffffff;
-    font-weight: bold;
+.modules-right > widget:last-child {
+    margin-right: 4px;
 }

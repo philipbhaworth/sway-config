@@ -173,7 +173,7 @@ bindsym $mod+z exec zed
 bindsym $mod+Shift+x exec $lock
 
 # Directory containing your wallpapers
-set $wallpapers ~/Pictures/Wallpapers
+set $wallpapers ~/dotfiles/Wallpapers
 
 # Keybinding: switch wallpaper to a random file from the folder (no swww)
 bindsym $mod+Shift+w exec swaybg -m fill -i $(find $wallpapers -type f | shuf -n 1)

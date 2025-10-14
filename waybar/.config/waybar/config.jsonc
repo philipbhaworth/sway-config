@@ -32,11 +32,9 @@
   // Modules configuration
   "sway/workspaces": {
     "disable-scroll": true,
-    "all-outputs": true,
-    "format": "{name}",
-    "persistent-workspaces": {
-      "*": 9,
-    },
+    "all-outputs": false, // important: only show per-monitor active workspaces
+    "format": "{value}", // shows the full name like 1:term or 6:code
+    "sort-by-number": true,
   },
   "sway/window": {
     "max-length": 40,
@@ -47,7 +45,8 @@
     "spacing": 10,
   },
   "clock": {
-    "format-alt": "{:%Y-%m-%d}",
+    "format": "{:%I:%M %p}", // 12-hour clock with AM/PM
+    "format-alt": "{:%Y-%m-%d}", // (optional) alternate format when clicked
   },
   "cpu": {
     "format": "CPU: {usage}%",

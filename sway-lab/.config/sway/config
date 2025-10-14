@@ -184,12 +184,12 @@ bindsym $mod+Shift+v exec cliphist list | wofi -dmenu | cliphist decode | wl-cop
 # Session controls
 bindsym $mod+Shift+r reload
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
-bindsym $mod+Shift+p exec ~/.config/sway/scripts/powermenu.sh
+bindsym $mod+Shift+Escape exec ~/.config/sway/scripts/powermenu.sh
 
 ### Tools & Utilities
 # Screenshots (Wayland-native for multi-monitor support)
 bindsym $mod+Shift+s exec ~/.config/sway/scripts/screenshot.sh region
-bindsym Print exec ~/.config/sway/scripts/screenshot.sh full
+bindsym $mod+Shift+p exec ~/.config/sway/scripts/screenshot.sh full
 
 # Toggle autotiling on/off
 bindsym $mod+Shift+t exec pgrep autotiling && pkill autotiling || autotiling --splitratio 1.61
@@ -200,8 +200,8 @@ focus_follows_mouse no
 ### Gaps
 gaps inner 10
 gaps outer 5
-smart_gaps on
-smart_borders on
+smart_gaps off
+smart_borders off
 
 bindsym $mod+comma  gaps inner all minus 5
 bindsym $mod+period gaps inner all plus 5
@@ -274,7 +274,7 @@ client.unfocused $bg0 $bg1 $gray $bg0 $bg1
 client.urgent $red $bg1 $fg $yellow $red
 
 # Border settings
-default_border pixel 2
+default_border pixel 3
 titlebar_padding 8 2
 titlebar_border_thickness 2
 

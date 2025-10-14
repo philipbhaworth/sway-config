@@ -69,32 +69,32 @@ button:hover {
 }
 
 #clock {
-    color: @cyn;
+    color: @white;
     border-bottom: 4px solid @cyn;
 }
 
 #battery {
-    color: @mag;
+    color: @white;
     border-bottom: 4px solid @mag;
 }
 
 #disk {
-    color: @ylw;
+    color: @white;
     border-bottom: 4px solid @ylw;
 }
 
 #memory {
-    color: @mag;
+    color: @white;
     border-bottom: 4px solid @mag;
 }
 
 #cpu {
-    color: @grn;
+    color: @white;
     border-bottom: 4px solid @grn;
 }
 
 #network {
-    color: @blu;
+    color: @white;
     border-bottom: 4px solid @blu;
 }
 

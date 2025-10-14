@@ -1,5 +1,4 @@
-# Custom Sway configuration (Debian 13 Trixie)
-# Copy this to ~/.config/sway/config
+# Sway configuration
 # Read `man 5 sway` for a complete reference.
 
 ### Variables
@@ -12,9 +11,30 @@ set $filebrowser thunar
 set $browser firefox
 
 # Terminal and menu configuration
-# Terminal and menu configuration
 set $term kitty
 set $menu wofi --show drun
+
+# Styled lock screen (Flexoki colors)
+set $lock swaylock \
+    --color 100f0f \
+    --inside-color 282726 \
+    --inside-clear-color 24837b \
+    --inside-ver-color ad8301 \
+    --inside-wrong-color af3029 \
+    --ring-color cecdc3 \
+    --ring-clear-color 24837b \
+    --ring-ver-color ad8301 \
+    --ring-wrong-color af3029 \
+    --key-hl-color 24837b \
+    --bs-hl-color af3029 \
+    --separator-color 100f0f \
+    --text-color cecdc3 \
+    --text-clear-color cecdc3 \
+    --text-ver-color cecdc3 \
+    --text-wrong-color cecdc3 \
+    --indicator-radius 100 \
+    --indicator-thickness 10 \
+    --font "JetBrainsMono Nerd Font"
 
 # Workspace names for better organization
 set $ws1 "1:term"
@@ -28,10 +48,21 @@ set $ws8 "8:chat"
 set $ws9 "9"
 set $ws10 "10:spot"
 
-### Output Configuration
-# Default wallpaper
-output * bg ~/wallpapers/wall36.jpg fill
+### Flexoki Color Scheme Variables
+set $bg0     #100f0f
+set $bg1     #282726
+set $fg      #cecdc3
+set $green   #66800b
+set $blue    #205ea6
+set $yellow  #ad8301
+set $gray    #928374
+set $red     #af3029
+set $magenta #5e409d
+set $cyan    #24837b
+set $white   #fffcf0
+set $orange  #bc5215
 
+### Output Configuration
 # Dual monitor configuration
 # LG HDR 4K on the left
 output DP-1 resolution 3840x2160 position 0,0 scale 1
@@ -53,6 +84,9 @@ workspace $ws7 output DP-2
 workspace $ws8 output DP-2
 workspace $ws9 output DP-2
 workspace $ws10 output DP-2
+
+### Font Configuration
+font pango:JetBrainsMono Nerd Font 12
 
 ### Input Configuration
 input type:keyboard {
@@ -80,12 +114,12 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 bindsym $mod+q kill
-bindsym $mod+Shift+f fullscreen
+bindsym $mod+f fullscreen
 bindsym $mod+space focus mode_toggle
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+a focus parent
 
-### Workspaces
+### Workspaces (plain, no SOV)
 bindsym $mod+1 workspace $ws1
 bindsym $mod+2 workspace $ws2
 bindsym $mod+3 workspace $ws3
@@ -128,22 +162,37 @@ bindsym $mod+minus scratchpad show
 # Core applications
 bindsym $mod+Return exec $term
 bindsym $mod+d exec $menu
-bindsym $mod+f exec $filebrowser
+bindsym $mod+shift+f exec $filebrowser
 bindsym $mod+shift+b exec $browser
 
 # Editors / IDEs
-bindsym $mod+c exec codium
-bindsym $mod+x exec subl
+bindsym $mod+c exec vscodium
 bindsym $mod+z exec zed
+
+# Manual lock
+bindsym $mod+Shift+x exec $lock
+
+# Directory containing your wallpapers
+set $wallpapers ~/dotfiles/wallpapers
+
+# Keybinding: switch wallpaper to a random file from the folder (no swww)
+bindsym $mod+Shift+w exec swaybg -m fill -i $(find $wallpapers -type f | shuf -n 1)
+
+# Clipboard history
+bindsym $mod+Shift+v exec cliphist list | wofi -dmenu | cliphist decode | wl-copy
 
 # Session controls
 bindsym $mod+Shift+r reload
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+bindsym $mod+Shift+p exec ~/.config/sway/scripts/powermenu.sh
 
 ### Tools & Utilities
 # Screenshots (Wayland-native for multi-monitor support)
-bindsym $mod+Shift+s exec grim -g "$(slurp)" - | tee >(wl-copy) | swappy -f -
-bindsym Print exec grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
+bindsym $mod+Shift+s exec ~/.config/sway/scripts/screenshot.sh region
+bindsym Print exec ~/.config/sway/scripts/screenshot.sh full
+
+# Toggle autotiling on/off
+bindsym $mod+Shift+t exec pgrep autotiling && pkill autotiling || autotiling --splitratio 1.61
 
 ### Focus behavior
 focus_follows_mouse no
@@ -160,8 +209,7 @@ bindsym $mod+Shift+comma  gaps outer all minus 5
 bindsym $mod+Shift+period gaps outer all plus 5
 
 ### Media & Hardware Keys
-
-# Volume controls (Debian-compatible using pamixer)
+# Volume controls (using pamixer)
 bindsym --locked XF86AudioRaiseVolume exec pamixer -i 5
 bindsym --locked XF86AudioLowerVolume exec pamixer -d 5
 bindsym --locked XF86AudioMute exec pamixer -t
@@ -204,27 +252,62 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
+### Window Rules
+# Floating window rules
+for_window [app_id="pavucontrol"] floating enable, move position center, resize set 600 400
+for_window [app_id="org.gnome.DiskUtility"] floating enable, move position center
+for_window [title="Picture-in-Picture"] floating enable, sticky enable
+
 ### Bar (Waybar)
 bar {
     swaybar_command waybar
 }
 
+### Borders and Colors (Flexoki theme)
+# Focused window border (cyan/teal)
+client.focused $cyan $bg1 $fg $yellow $cyan
+
+# Unfocused window border
+client.unfocused $bg0 $bg1 $gray $bg0 $bg1
+
+# Urgent window border (red)
+client.urgent $red $bg1 $fg $yellow $red
+
+# Border settings
+default_border pixel 2
+titlebar_padding 8 2
+titlebar_border_thickness 2
+
 ### Idle & Lock Configuration
-exec LT="$lock_timeout" ST="$screen_timeout" LT=${LT:-300} ST=${ST:-60} && \
-    swayidle -w \
-        timeout $LT 'swaylock -f' \
-        timeout $((LT + ST)) 'swaymsg "output * power off"' \
-                      resume 'swaymsg "output * power on"'  \
-        timeout $ST 'pgrep -xu "$USER" swaylock >/dev/null && swaymsg "output * power off"' \
-             resume 'pgrep -xu "$USER" swaylock >/dev/null && swaymsg "output * power on"'  \
-        before-sleep 'swaylock -f' \
-        lock 'swaylock -f' \
-        unlock 'pkill -xu "$USER" -SIGUSR1 swaylock'
+exec swayidle -w \
+    timeout 300 '$lock' \
+    timeout 600 'swaymsg "output * power off"' \
+    resume 'swaymsg "output * power on"' \
+    before-sleep '$lock'
 
 ### Autostart
 # Notifications
 exec_always swaync
 
-### Include system defaults (Debian-compatible)
+# Network manager tray icon
+exec nm-applet --indicator
+
+# Bluetooth manager tray
+exec blueman-applet
+
+# Clipboard history
+exec wl-paste --type text --watch cliphist store &
+exec wl-paste --type image --watch cliphist store &
+
+# Automatic tiling with golden ratio
+exec_always autotiling --splitratio 1.61
+
+# Optional: set an initial wallpaper at login (uses $wallpapers)
+# exec_always swaybg -m fill -i $wallpapers/default.jpg
+
+# Day/night color temperature adjustment (North Liberty, IA)
+exec wlsunset -l 41.7 -L -91.6
+
+### Include system defaults
 include /etc/sway/config.d/*
 include ~/.config/sway/config.d/*

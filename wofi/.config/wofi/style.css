@@ -1,29 +1,30 @@
-/* Wofi Everforest: high-contrast panel that won't blend into dark apps */
+/* Wofi Flexoki Theme */
 
 /* Outer window panel */
 window {
     margin: 0;
-    background-color: #38423d;      /* noticeably different from app bg */
-    border-radius: 14px;
-    border: 3px solid #d3c6aa;      /* light ring for separation */
+    background-color: #282726; /* Flexoki bg1 */
+    border-radius: 12px;
+    border: 3px solid #24837b; /* Flexoki cyan */
+    font-family: "JetBrainsMono Nerd Font";
 }
 
-/* Secondary ring to create a double-edge effect */
+/* Secondary layer for depth */
 #outer-box {
     margin: 0;
-    border-radius: 12px;
-    background-color: #2b3339;      /* darker than window to create depth */
-    border: 2px solid #7a8478;      /* neutral inner ring */
+    border-radius: 10px;
+    background-color: #1c1b1a; /* Flexoki darker */
+    border: 2px solid #928374; /* Flexoki gray */
 }
 
 /* List container */
 #inner-box {
     margin: 6px;
-    border-radius: 10px;
-    background-color: #323c41;      /* list body */
-    border: 1px solid #7a8478;
-    color: #d3c6aa;
-    font-weight: 600;
+    border-radius: 8px;
+    background-color: #100f0f; /* Flexoki bg0 */
+    border: 1px solid #928374;
+    color: #cecdc3; /* Flexoki fg */
+    font-weight: 500;
 }
 
 #scroll {
@@ -33,53 +34,64 @@ window {
     border-radius: 8px;
 }
 
-/* Input */
+/* Input field */
 #input {
     margin: 10px 12px 8px 12px;
-    padding: 8px 16px;
-    border-radius: 10px;
-    background-color: #3a454a;
-    border: 2px solid #7a8478;
-    color: #d3c6aa;
-    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background-color: #282726;
+    border: 2px solid #928374;
+    color: #cecdc3;
+    font-weight: 600;
+    font-size: 14px;
     outline: none;
 }
 
 #input:focus {
-    background-color: #414d52;
-    border: 2px solid #a7c080;      /* accent on focus */
+    background-color: #282726;
+    border: 2px solid #24837b; /* Cyan accent on focus */
+    box-shadow: 0 0 8px rgba(36, 131, 123, 0.3);
 }
 
-/* Entries */
+/* Entry items */
 #entry {
-    margin: 3px;
-    padding: 6px 10px;
+    margin: 2px 4px;
+    padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid transparent;
     background: transparent;
+    color: #cecdc3;
 }
 
 #entry:hover {
-    background-color: #3a454a;
-    border: 1px solid #7a8478;
+    background-color: #282726;
+    border: 1px solid #928374;
 }
 
 #entry:selected {
-    background-color: #a7c080;      /* accent selection */
-    color: #2b3339;
-    border: 1px solid #d3c6aa;      /* light edge to “lift” */
-    font-weight: 700;
+    background-color: #24837b; /* Cyan selection */
+    color: #fffcf0; /* Flexoki white */
+    border: 1px solid #24837b;
+    font-weight: 600;
+}
+
+/* Text styling */
+#text {
+    color: #cecdc3;
+    font-size: 13px;
 }
 
 #text:selected {
-    background-color: #a7c080;
-    color: #2b3339;
-    font-weight: 700;
-    border-radius: 6px;
+    color: #fffcf0;
+    font-weight: 600;
 }
 
-#img { margin-right: 10px; }
+/* Image/icon styling */
+#img {
+    margin-right: 12px;
+    border-radius: 4px;
+}
+
 #img:selected {
-    background-color: #a7c080;
-    border-radius: 6px;
+    background-color: transparent;
 }

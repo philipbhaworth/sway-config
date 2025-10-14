@@ -1,151 +1,108 @@
-/* ========== Global Styles ========== */
+/* Flexoki Color Scheme */
+@define-color bg    #100f0f; /* Base (dark background) */
+@define-color fg    #cecdc3; /* Text (light foreground) */
+@define-color blk   #1c1b1a; /* Black variant */
+@define-color red   #af3029; /* Red */
+@define-color grn   #66800b; /* Green */
+@define-color ylw   #ad8301; /* Yellow/Orange */
+@define-color blu   #205ea6; /* Blue */
+@define-color mag   #5e409d; /* Purple/Magenta */
+@define-color cyn   #24837b; /* Cyan */
+@define-color brblk #282726; /* UI element background */
+@define-color white #fffcf0; /* Paper (lightest) */
+
 * {
-    font-family:
-        "JetBrainsMono Nerd Font", "JetBrains Mono", "Font Awesome 6 Free",
-        "Font Awesome 6 Brands", monospace;
+    font-family: "JetBrainsMono Nerd Font", monospace;
     font-size: 16px;
-    font-weight: normal;
+    font-weight: bold;
 }
 
-/* ========== Window ========== */
 window#waybar {
-    background-color: rgba(43, 48, 59, 0.95);
-    border-bottom: 2px solid rgba(100, 114, 125, 0.8);
-    color: #ffffff;
-    transition-property: background-color;
-    transition-duration: 0.3s;
-}
-
-window#waybar.hidden {
-    opacity: 0.2;
-}
-
-/* ========== Buttons ========== */
-button {
-    box-shadow: none;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    color: inherit;
-}
-
-button:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* ========== Workspaces ========== */
-#workspaces {
-    margin: 0;
+    background-color: @bg;
+    color: @fg;
 }
 
 #workspaces button {
-    padding: 4px 12px;
-    margin: 0 2px;
-    background-color: transparent;
-    color: #ffffff;
-    border-radius: 3px;
+    padding: 0 6px;
+    color: @cyn;
+    background: transparent;
+    border-bottom: 3px solid @bg;
 }
 
-#workspaces button:hover {
-    background: rgba(255, 255, 255, 0.1);
+#workspaces button.active {
+    color: @cyn;
+    border-bottom: 3px solid @mag;
 }
 
-#workspaces button.focused {
-    background-color: rgba(255, 255, 255, 0.2);
-    font-weight: bold;
+#workspaces button.empty {
+    color: @white;
+}
+
+#workspaces button.empty.active {
+    color: @cyn;
+    border-bottom: 3px solid @mag;
 }
 
 #workspaces button.urgent {
-    background-color: #e74c3c;
-    color: #ffffff;
+    background-color: @red;
 }
 
-/* ========== All Modules - Base Styling ========== */
+button:hover {
+    background: inherit;
+    box-shadow: inset 0 -3px #ffffff;
+}
+
 #clock,
+#custom-sep,
 #battery,
 #cpu,
 #memory,
-#backlight,
+#disk,
 #network,
-#pulseaudio,
-#tray,
-#mode,
-#idle_inhibitor,
-#scratchpad,
-#window,
-#language,
-#custom-power {
-    padding: 4px 12px;
-    margin: 0 2px;
-    background-color: transparent;
-    color: #ffffff;
-    border-radius: 3px;
+#tray {
+    padding: 0 8px;
+    color: @white;
 }
 
-/* ========== Specific Modules ========== */
-#window {
-    margin: 0;
-    font-style: italic;
+#custom-sep {
+    color: @brblk;
 }
 
-#mode {
-    background-color: #e74c3c;
-    font-weight: bold;
+#clock {
+    color: @cyn;
+    border-bottom: 4px solid @cyn;
 }
 
-#scratchpad.empty {
-    opacity: 0.5;
+#battery {
+    color: @mag;
+    border-bottom: 4px solid @mag;
 }
 
-/* ========== Module States ========== */
-/* Battery */
-#battery.critical:not(.charging) {
-    background-color: #e74c3c;
-    animation: blink 1s steps(2) infinite;
+#disk {
+    color: @ylw;
+    border-bottom: 4px solid @ylw;
 }
 
-#battery.warning:not(.charging) {
-    background-color: #f39c12;
-    color: #000000;
+#memory {
+    color: @mag;
+    border-bottom: 4px solid @mag;
 }
 
-#battery.charging {
-    background-color: #27ae60;
+#cpu {
+    color: @grn;
+    border-bottom: 4px solid @grn;
 }
 
-/* Network */
+#network {
+    color: @blu;
+    border-bottom: 4px solid @blu;
+}
+
 #network.disconnected {
-    background-color: #e74c3c;
+    background-color: @red;
 }
 
-/* Audio */
-#pulseaudio.muted {
-    background-color: #95a5a6;
-    color: #2c3e50;
-}
-
-/* Idle Inhibitor */
-#idle_inhibitor.activated {
-    background-color: #f39c12;
-    color: #000000;
-}
-
-/* ========== System Tray ========== */
-#tray > .passive {
-    -gtk-icon-effect: dim;
-}
-
-#tray > .needs-attention {
-    -gtk-icon-effect: highlight;
-    background-color: #e74c3c;
-    border-radius: 3px;
-}
-
-/* ========== Layout Adjustments ========== */
-.modules-left > widget:first-child > #workspaces {
-    margin-left: 4px;
-}
-
-.modules-right > widget:last-child {
-    margin-right: 4px;
+#tray {
+    color: @fg;
+    background-color: @brblk;
 }

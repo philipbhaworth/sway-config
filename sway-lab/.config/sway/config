@@ -173,7 +173,7 @@ bindsym $mod+z exec zed
 bindsym $mod+Shift+x exec $lock
 
 # Directory containing your wallpapers
-set $wallpapers ~/dotfiles/wallpapers
+set $wallpapers ~/wallpapers/wallpapers
 
 # Keybinding: switch wallpaper to a random file from the folder (no swww)
 bindsym $mod+Shift+w exec swaybg -m fill -i $(find $wallpapers -type f | shuf -n 1)
@@ -303,10 +303,11 @@ exec wl-paste --type image --watch cliphist store &
 exec_always autotiling --splitratio 1.61
 
 # Optional: set an initial wallpaper at login (uses $wallpapers)
-# exec_always swaybg -m fill -i $wallpapers/default.jpg
+exec_always swaybg -m fill -i $wallpapers/wall62.png
 
 # Day/night color temperature adjustment (North Liberty, IA)
 exec wlsunset -l 41.7 -L -91.6
+
 
 ### Include system defaults
 include /etc/sway/config.d/*

@@ -16,6 +16,8 @@ set $menu wofi --show drun
 
 # Styled lock screen (Flexoki colors)
 set $lock swaylock \
+    --image ~/wallpapers/wallpapers/wall72.png \
+    --scaling fill \
     --color 100f0f \
     --inside-color 282726 \
     --inside-clear-color 24837b \

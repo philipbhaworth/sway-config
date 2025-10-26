@@ -67,8 +67,7 @@ echo "=== Installing Fonts (Debian Packages) ==="
 sudo apt install -y \
   fonts-font-awesome \
   fonts-noto fonts-noto-mono fonts-noto-color-emoji \
-  fonts-jetbrains-mono fonts-hack fonts-terminus fonts-firacode \
-  fonts-ibm-plex fonts-source-code-pro
+  fonts-jetbrains-mono fonts-hack fonts-terminus fonts-firacode
 
 echo "=== Installing Nerd Fonts (from upstream releases) ==="
 tmpdir=$(mktemp -d)

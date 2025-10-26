@@ -163,6 +163,7 @@ bindsym $mod+minus scratchpad show
 ### Launchers
 # Core applications
 bindsym $mod+Return exec $term
+bindsym $mod+shift+Return exec foot
 bindsym $mod+d exec $menu
 bindsym $mod+shift+f exec $filebrowser
 bindsym $mod+shift+b exec $browser
@@ -175,7 +176,7 @@ bindsym $mod+z exec zed
 bindsym $mod+Shift+x exec $lock
 
 # Directory containing your wallpapers
-set $wallpapers ~/wallpapers/wallpapers
+set $wallpapers ~/wallpapers
 
 # Keybinding: switch wallpaper to a random file from the folder (no swww)
 bindsym $mod+Shift+w exec swaybg -m fill -i $(find $wallpapers -type f | shuf -n 1)

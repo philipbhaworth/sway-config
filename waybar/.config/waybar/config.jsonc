@@ -27,6 +27,8 @@
     "clock",
     "custom/sep",
     "tray",
+    "custom/sep",
+    "idle_inhibitor",
   ],
 
   // Modules configuration
@@ -47,6 +49,15 @@
   "clock": {
     "format": "{:%I:%M %p}", // 12-hour clock with AM/PM
     "format-alt": "{:%Y-%m-%d}", // (optional) alternate format when clicked
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "ON",
+      "deactivated": "OFF",
+    },
+    "tooltip": true,
+    "tooltip-format": "Idle Inhibitor: {status}",
   },
   "cpu": {
     "format": "CPU: {usage}%",

@@ -12,7 +12,7 @@ set $browser firefox
 
 # Terminal and menu configuration
 set $term kitty
-set $menu wofi --show drun
+set $menu exec rofi -show drun
 
 # Styled lock screen (Flexoki colors)
 set $lock swaylock \
@@ -303,7 +303,7 @@ exec wl-paste --type text --watch cliphist store &
 exec wl-paste --type image --watch cliphist store &
 
 # Automatic tiling with golden ratio
-exec_always autotiling --splitratio 1.61
+#exec_always autotiling --splitratio 1.61
 
 # Optional: set an initial wallpaper at login (uses $wallpapers)
 exec_always swaybg -m fill -i $wallpapers/wall62.png

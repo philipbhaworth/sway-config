@@ -1,0 +1,63 @@
+/* Flexoki-inspired Dark Gray — minimal, no boxes, no icons */
+* {
+  bg:      #1e1e1e;
+  bg-alt:  #2a2a2a;
+  fg:      #cecdc3;
+  accent:  #24837b;
+  background-color: @bg;
+  text-color: @fg;
+}
+
+window {
+  location: center;
+  width: 30%;
+  border: 1px;
+  border-color: @accent;
+  border-radius: 8px;
+  padding: 10px;
+  transparency: "real";
+}
+
+mainbox {
+  children: [ inputbar, listview ];
+}
+
+inputbar {
+  background-color: @bg-alt;
+  border-radius: 6px;
+  padding: 6px 8px;
+  children: [ prompt, entry ];
+}
+
+prompt {
+  text-color: @accent;
+  padding: 0 8px 0 0;
+}
+
+entry {
+  background-color: inherit;
+  padding: 0;
+}
+
+listview {
+  spacing: 3px;
+  padding: 10px 0 0 0;
+}
+
+element {
+  padding: 3px 8px;
+}
+
+element-text {
+  background-color: transparent;
+  text-color: @fg;
+}
+
+element selected {
+  background-color: transparent;
+}
+
+element-text selected {
+  text-color: @accent;
+  font: "JetBrainsMono Nerd Font 13 Bold";
+}

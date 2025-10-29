@@ -1,80 +1,9 @@
-/* Flexoki Rofi Theme — Minimal & Clean */
-
 configuration {
-    font: "JetBrainsMono Nerd Font 14";
-    show-icons: false;
-    display-drun: "Run:";
-    display-run: "Run:";
-    modi: "drun,run";
-    lines: 10;
-    columns: 1;
-    fixed-num-lines: true;
+  font: "JetBrainsMono Nerd Font 13";
+  show-icons: true;
+  lines: 10;
+  fixed-num-lines: true;
+  hide-scrollbar: true;
 }
-
-/* Color Palette */
-@define-color bg    #282726;
-@define-color fg    #cecdc3;
-@define-color blk   #1c1b1a;
-@define-color red   #af3029;
-@define-color grn   #66800b;
-@define-color ylw   #ad8301;
-@define-color blu   #205ea6;
-@define-color mag   #5e409d;
-@define-color cyn   #24837b;
-@define-color brblk #282726;
-@define-color white #fffcf0;
-
-/* Window */
-window {
-    background-color: @bg;
-    border: 2px solid @cyn;
-    border-radius: 10px;
-    padding: 10px;
-}
-
-/* Main Input Box */
-inputbar {
-    background-color: @blk;
-    text-color: @fg;
-    padding: 6px;
-    border-radius: 6px;
-}
-
-/* Prompt ("Run:") */
-prompt {
-    text-color: @cyn;
-    margin: 0px 6px;
-}
-
-/* Entry Field */
-entry {
-    text-color: @white;
-    placeholder-color: @brblk;
-}
-
-/* List of Matches */
-listview {
-    background-color: transparent;
-    spacing: 4px;
-}
-
-/* Each Entry Row */
-element {
-    background-color: transparent;
-    text-color: @fg;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-element selected {
-    background-color: @cyn;
-    text-color: @blk;
-}
-
-/* Scrollbar */
-scrollbar {
-    handle-color: @cyn;
-    handle-width: 6px;
-    border-radius: 3px;
-}
-
+/* Tell Rofi to use our theme */
+@theme "~/.config/rofi/themes/flexoki-dark-gray.rasi"
